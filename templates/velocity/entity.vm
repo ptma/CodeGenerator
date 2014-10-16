@@ -1,0 +1,35 @@
+package ${basePackage}.${moduleName}.entity;
+
+#if ($table.hasDateColumn)
+import java.sql.Date;
+#end
+#if ($table.hasBigDecimalColumn)
+import java.math.BigDecimal;
+#end
+
+import org.apache.ibatis.type.Alias;
+
+/**
+ * <p>实体类</p>
+ * <p>Table: ${table.tableName} - ${table.remarks}</p>
+ *
+ * @since ${.now}
+ */
+@Alias("${table.className}")
+public class ${table.className} {
+
+#foreach($column in $table.columns)
+    /** ${column.remarks} */
+    private $column.javaType $column.javaProperty;
+#end
+
+#foreach($column in $table.columns)
+
+    public ${column.javaType} ${column.getterMethodName}(){
+        return this.${column.javaProperty};
+    }
+    public void ${column.setterMethodName}(${column.javaType} ${column.javaProperty}){
+        this.${column.javaProperty} = ${column.javaProperty};
+    }
+#end
+}

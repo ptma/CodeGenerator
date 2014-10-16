@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<TypeMapping>
+    <map sqlType="ARRAY" javaType="Object" fullJavaType="java.lang.Object" />
+    <map sqlType="BIGINT" javaType="Long" fullJavaType="java.lang.Long" />
+    <map sqlType="BINARY" javaType="byte[]" fullJavaType="byte[]" />
+    <map sqlType="BIT" javaType="Boolean" fullJavaType="java.lang.Boolean" />
+    <map sqlType="BLOB" javaType="byte[]" fullJavaType="byte[]" />
+    <map sqlType="BOOLEAN" javaType="Boolean" fullJavaType="java.lang.Boolean" />
+    <map sqlType="CHAR" javaType="String" fullJavaType="java.lang.String" />
+    <map sqlType="CLOB" javaType="String" fullJavaType="java.lang.String" />
+    <map sqlType="DATALINK" javaType="String" fullJavaType="java.lang.String" />
+    <map sqlType="DATE" javaType="Date" fullJavaType="java.sql.Date" />
+    <map sqlType="DECIMAL" javaType="BigDecimal" fullJavaType="java.math.BigDecimal" />
+    <map sqlType="DISTINCT" javaType="Object" fullJavaType="java.lang.Object" />
+    <map sqlType="DOUBLE" javaType="Double" fullJavaType="java.lang.Double" />
+    <map sqlType="FLOAT" javaType="Double" fullJavaType="java.lang.Double" />
+    <map sqlType="INTEGER" javaType="Integer" fullJavaType="java.lang.Integer" />
+    <map sqlType="JAVA_OBJECT" javaType="Object" fullJavaType="java.lang.Object" />
+    <map sqlType="LONGNVARCHAR" javaType="String" fullJavaType="java.lang.String" />
+    <map sqlType="LONGVARBINARY" javaType="byte[]" fullJavaType="byte[]" />
+    <map sqlType="LONGVARCHAR" javaType="String" fullJavaType="java.lang.String" />
+    <map sqlType="NCHAR" javaType="String" fullJavaType="java.lang.String" />
+    <map sqlType="NCLOB" javaType="String" fullJavaType="java.lang.String" />
+    <map sqlType="NVARCHAR" javaType="String" fullJavaType="java.lang.String" />
+    <map sqlType="NULL" javaType="Object" fullJavaType="java.lang.Object" />
+    <map sqlType="NUMERIC" javaType="BigDecimal" fullJavaType="java.math.BigDecimal" />
+    <map sqlType="OTHER" javaType="Object" fullJavaType="java.lang.Object" />
+    <map sqlType="REAL" javaType="Float" fullJavaType="java.lang.Float" />
+    <map sqlType="REF" javaType="Object" fullJavaType="java.lang.Object" />
+    <map sqlType="SMALLINT" javaType="Short" fullJavaType="java.lang.Short" />
+    <map sqlType="STRUCT" javaType="Object" fullJavaType="java.lang.Object" />
+    <map sqlType="TIME" javaType="Date" fullJavaType="java.sql.Date" />
+    <map sqlType="TIMESTAMP" javaType="Date" fullJavaType="java.sql.Date" />
+    <map sqlType="TINYINT" javaType="Byte" fullJavaType="java.lang.Byte" />
+    <map sqlType="VARBINARY" javaType="byte[]" fullJavaType="byte[]" />
+    <map sqlType="VARCHAR" javaType="String" fullJavaType="java.lang.String" />
+</TypeMapping>

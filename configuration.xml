@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<configuration>
+    <classpath>
+        <entry>lib/ojdbc14.jar</entry>
+        <entry>lib/sqljdbc4.jar</entry>
+        <entry>lib/mysql-connector-java-3.1.7-bin.jar</entry>
+        <entry>lib/postgresql-8.2-505.jdbc2.jar</entry>
+    </classpath>
+    <connections>
+
+    </connections>
+    <tagertProject>D:\temp</tagertProject>
+    <basePackage>org.joy</basePackage>
+    <moduleName>test</moduleName>
+    <templates>
+        <template engine="freemarker" name="实体类" selected="false">
+            <templateFile>entity.ftl</templateFile>
+            <targetPath>${tagertProject}\src\${basePackage}\${moduleName}\entity\</targetPath>
+            <targetFileName>${table.className}.java</targetFileName>
+            <encoding>UTF-8</encoding>
+        </template>
+        <template engine="velocity" name="实体类" selected="false">
+            <templateFile>entity.vm</templateFile>
+            <targetPath>${tagertProject}\\src\\${basePackage}\\${moduleName}\\entity\\</targetPath>
+            <targetFileName>${table.className}2.java</targetFileName>
+            <encoding>UTF-8</encoding>
+        </template>
+    </templates>
+</configuration>
