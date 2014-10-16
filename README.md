@@ -37,29 +37,29 @@ CodeGenerator
 ##模板中可用的变量和方法
 ### table 对象
 ####属性
-	String       tableName           表名
+	String        tableName    表名
 
-	String       tableType           表类型
+	String        tableType    表类型
 
-	String       tableAlias          表别名
+	String        tableAlias    表别名
 
-	String       remarks             表注释
+	String        remarks    表注释
 
-	String       remarksUnicode      表注释转Unicode后的字符串
+	String        remarksUnicode    表注释转Unicode后的字符串
 
-	String       className           实体类名
+	String        className    实体类名
 
-	String       javaProperty        实体类作为属性时的名字 == ${table.className?uncap_first}
+	String        javaProperty    实体类作为属性时的名字 == ${table.className?uncap_first}
 
-	List<Column> primaryKeys         主键集
+	List<Column>    primaryKeys    主键集
 
-	List<Column> baseColumns         基本字段集
+	List<Column>    baseColumns    基本字段集
 
-	List<Column> columns             所有字段  == primaryKeys + baseColumns
+	List<Column>    columns    所有字段  == primaryKeys + baseColumns
 
-	boolean      hasDateColumn       是否有日期类型字段
+	boolean        hasDateColumn    是否有日期类型字段
 
-	boolean      hasBigDecimalColumn 是否有 BigDecimal 字段
+	boolean        hasBigDecimalColumn    是否有 BigDecimal 字段
 
 ### column
 ####属性
@@ -69,7 +69,7 @@ CodeGenerator
 
 	boolean isForeignKey     是否为外键
 
-	int     length           字段长度
+	int     size           字段长度
 
 	int     decimalDigits    小数位长度
 
