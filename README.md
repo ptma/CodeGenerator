@@ -15,12 +15,12 @@ CodeGenerator
         <!-- 代码生成目标基准目录 -->
         <tagertProject>D:\temp</tagertProject>
         <!-- 基本包 -->
-        <basePackage>com.dfkj</basePackage>
+        <basePackage>org.joy</basePackage>
         <!-- 模块名 -->
         <moduleName>test</moduleName>
         <templates>
             <!-- 模板 ，手动添加 -->
-            <template name="实体类" selected="true">
+            <template name="实体类" engine="freemarker">
                 <!-- 模板文件 -->
                 <templateFile>./entity.ftl</templateFile>
                 <!-- 文件路径 -->
@@ -37,7 +37,7 @@ CodeGenerator
 ##模板中可用的变量和方法
 ### table 对象
 ####属性
-	String       tableName           表名
+    String       tableName           表名
 
 	String       tableType           表类型
 
@@ -63,13 +63,13 @@ CodeGenerator
 
 ### column
 ####属性
-	String  columnName       字段名
+	String	columnName       字段名
 
 	boolean isPrimaryKey     是否为主键
 
 	boolean isForeignKey     是否为外键
 
-	int     length           字段长度
+	int     size             字段长度
 
 	int     decimalDigits    小数位长度
 
