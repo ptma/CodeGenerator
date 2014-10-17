@@ -246,7 +246,11 @@ public class GenerationDialog extends JDialog {
                 templateElement.setSelected(true);
 
                 TemplateEngine templateEngine = engineBuilder.getTemplateEngine(templateElement.getEngine());
-                templateEngine.processToFile(model, templateElement);
+                if(templateEngine==null){
+                    JOptionPane.showMessageDialog(this, "没有对应的模板引擎: "+templateElement.getEngine(), "错误", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    templateEngine.processToFile(model, templateElement);
+                }
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
             }
