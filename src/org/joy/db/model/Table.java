@@ -17,7 +17,7 @@ public class Table implements java.io.Serializable, Cloneable {
     private String            catalog           = null;
     private String            schema            = null;
     private List<Column>      baseColumns       = new ArrayList<Column>();
-    private List<Column>      primaryKeyColumns = new ArrayList<Column>();
+    private List<Column>      primaryKeys = new ArrayList<Column>();
 
     public Table(){
     }
@@ -74,7 +74,7 @@ public class Table implements java.io.Serializable, Cloneable {
     }
 
     public Column getColumn(String columnName) {
-        for (Column column : primaryKeyColumns) {
+        for (Column column : primaryKeys) {
             if (column.getColumnName().equals(columnName)) {
                 return column;
             }
@@ -89,7 +89,7 @@ public class Table implements java.io.Serializable, Cloneable {
 
     public List<Column> getColumns() {
         List<Column> allColumns = new ArrayList<Column>();
-        allColumns.addAll(primaryKeyColumns);
+        allColumns.addAll(primaryKeys);
         allColumns.addAll(baseColumns);
         return allColumns;
     }
@@ -102,12 +102,12 @@ public class Table implements java.io.Serializable, Cloneable {
         this.baseColumns.add(column);
     }
 
-    public List<Column> getPrimaryKeyColumns() {
-        return primaryKeyColumns;
+    public List<Column> getPrimaryKeys() {
+        return primaryKeys;
     }
 
-    public void addPrimaryKeyColumn(Column primaryKeyColumn) {
-        this.primaryKeyColumns.add(primaryKeyColumn);
+    public void addPrimaryKey(Column primaryKeyColumn) {
+        this.primaryKeys.add(primaryKeyColumn);
     }
 
     public String getJavaProperty() {

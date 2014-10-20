@@ -546,7 +546,7 @@ public class Generator extends JFrame {
             Database db = DatabaseFactory.createDatabase(connection, typeMapping);
             tableModel = db.getTable(null, databaseElement.getSchema(), tableName);
             Map<String, Column> columnMap = new LinkedHashMap<String, Column>();
-            List<Column> keyCols = tableModel.getPrimaryKeyColumns();
+            List<Column> keyCols = tableModel.getPrimaryKeys();
             for (Column col : keyCols) {
                 columnMap.put(col.getColumnName(), col);
             }
