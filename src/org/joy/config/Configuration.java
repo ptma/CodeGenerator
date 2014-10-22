@@ -131,7 +131,7 @@ public class Configuration {
 
         name = parseAttributes(node).getProperty("name");
         if (StringUtil.isNotEmpty(name) && StringUtil.isNotEmpty(driverClass) && StringUtil.isNotEmpty(url)
-            && StringUtil.isNotEmpty(username) && StringUtil.isNotEmpty(password)) {
+            && StringUtil.isNotEmpty(username)) {
             connectionHistory.add(new DatabaseElement(name, driverClass, url, username, password, schema));
         }
     }

@@ -304,10 +304,10 @@ public class DbManagementDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "请输入 Username.", "提示", JOptionPane.INFORMATION_MESSAGE);
             return null;
         }
-        if (StringUtil.isEmpty(password)) {
-            JOptionPane.showMessageDialog(this, "请输入 Password.", "提示", JOptionPane.INFORMATION_MESSAGE);
-            return null;
-        }
+//        if (StringUtil.isEmpty(password)) {
+//            JOptionPane.showMessageDialog(this, "请输入 Password.", "提示", JOptionPane.INFORMATION_MESSAGE);
+//            return null;
+//        }
         Connection conn = null;
         try {
             DatabaseElement dbItem = new DatabaseElement(name, selectedItem.getDriverClass(), url, username, password, schema);
