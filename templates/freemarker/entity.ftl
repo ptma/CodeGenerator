@@ -23,7 +23,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class ${table.className} {
 <#list table.primaryKeys as key>
 
-    /** ${column.columnName} - ${key.remarks} */
+    /** ${key.columnName} - ${key.remarks} */
     private ${key.javaType} ${key.javaProperty};
 </#list>
 <#list table.baseColumns as column>
