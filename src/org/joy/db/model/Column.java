@@ -231,4 +231,8 @@ public class Column implements java.io.Serializable, Cloneable {
         this.targetColumnName = targetColumnName;
     }
 
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

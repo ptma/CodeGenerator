@@ -63,6 +63,7 @@ import org.joy.task.CloseConnectionTask;
 import org.joy.task.TaskListener;
 import org.joy.util.ClassloaderUtility;
 import org.joy.util.ObjectFactory;
+import org.joy.util.StringUtil;
 
 public class Generator extends JFrame {
 
@@ -73,7 +74,7 @@ public class Generator extends JFrame {
                         "注释"                       };
 
     private JPanel                 contentPane;
-    private static JSplitPane      contentSplitPane;
+    private JSplitPane      contentSplitPane;
     private JMenuItem              mntmConnect;
     private JMenuItem              mntmDisconnect;
 
@@ -117,7 +118,7 @@ public class Generator extends JFrame {
                     Generator frame = new Generator();
                     frame.setVisible(true);
                     frame.centerScreen();
-                    contentSplitPane.setDividerLocation(0.25);
+                    frame.contentSplitPane.setDividerLocation(0.25);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -330,14 +331,22 @@ public class Generator extends JFrame {
     }
 
     private void loadTableTree(String schema) {
+        String schemaPattern = null;
         try {
             tablesNode.removeAllChildren();
             viewsNode.removeAllChildren();
-            ResultSet rs = connection.getMetaData().getTables(null, schema.toUpperCase(), "%", null);
+            if(StringUtil.isNotEmpty(schema)){
+                schemaPattern = schema;
+            }
+            ResultSet rs = connection.getMetaData().getTables(null, schemaPattern, "%", null);
             while (rs.next()) {
                 TreeNodeData data;
                 DefaultMutableTreeNode tableNode;
+                String tableSchema = rs.getString(2);
                 String tableName = rs.getString(3);
+                if(StringUtil.isNotEmpty(tableSchema)){
+                    tableName = tableSchema + "." + tableName;
+                }
                 if ("VIEW".equalsIgnoreCase(rs.getString(4))) {
                     data = new TreeNodeData(tableName, viewIcon, tableName);
                     tableNode = new DefaultMutableTreeNode(data);
@@ -533,18 +542,26 @@ public class Generator extends JFrame {
 
     private void loadDatabaseTable() {
         TreePath selPath = tablesTree.getSelectionPath();
-        if (selPath == null || selPath.getPath() == null) return;
+        if (selPath == null || selPath.getPath() == null) {
+            return;
+        }
         if (selPath.getPath().length == 3) {
             DefaultMutableTreeNode selNode = (DefaultMutableTreeNode) selPath.getPath()[2];
-            String tableName = ((TreeNodeData) selNode.getUserObject()).getText();
-            loadTableGridData(tableName);
+            String nodeText = ((TreeNodeData) selNode.getUserObject()).getText();
+            String tableSchema = null;
+            String tableName = nodeText;
+            if (nodeText.indexOf(".")>0) {
+                tableName = nodeText.substring(nodeText.indexOf(".")+1);
+                tableSchema = nodeText.substring(0, nodeText.indexOf("."));
+            }
+            loadTableGridData(tableSchema, tableName);
         }
     }
 
-    private void loadTableGridData(String tableName) {
+    private void loadTableGridData(String tableSchema, String tableName) {
         try {
             Database db = DatabaseFactory.createDatabase(connection, typeMapping);
-            tableModel = db.getTable(null, databaseElement.getSchema(), tableName);
+            tableModel = db.getTable(null, tableSchema, tableName);
             Map<String, Column> columnMap = new LinkedHashMap<String, Column>();
             List<Column> keyCols = tableModel.getPrimaryKeys();
             for (Column col : keyCols) {

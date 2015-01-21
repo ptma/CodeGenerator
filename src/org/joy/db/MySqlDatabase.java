@@ -17,7 +17,7 @@ public class MySqlDatabase extends DefaultDatabase {
     }
 
     @Override
-    public Table getTable(String catalog, String schema, String tableName) {
+    public Table getTable(String catalog, String schema, String tableName) throws SQLException {
         Table table = super.getTable(catalog, schema, tableName);
         if (table != null) {
             introspectTableComments(table);
@@ -25,7 +25,7 @@ public class MySqlDatabase extends DefaultDatabase {
         return table;
     }
 
-    public void introspectTableComments(Table table) {
+    public void introspectTableComments(Table table) throws SQLException {
         PreparedStatement psmt = null;
         ResultSet rs = null;
         try {
@@ -36,7 +36,7 @@ public class MySqlDatabase extends DefaultDatabase {
                 table.setRemarks(rs.getString("COMMENT"));
             }
         } catch (SQLException e) {
-
+            throw e;
         } finally {
             close(rs);
             close(psmt);

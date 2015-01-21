@@ -40,7 +40,7 @@ public class CheckBoxList extends JList {
         this.setUI(new CheckBoxListUI());
     }
 
-    class CheckBoxRenderer extends JCheckBox implements ListCellRenderer {
+    static class CheckBoxRenderer extends JCheckBox implements ListCellRenderer {
 
         private static final long serialVersionUID = -8835050180063363917L;
 

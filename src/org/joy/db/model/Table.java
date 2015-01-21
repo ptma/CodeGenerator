@@ -153,4 +153,9 @@ public class Table implements java.io.Serializable, Cloneable {
         }
         return false;
     }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

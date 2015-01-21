@@ -17,16 +17,20 @@ public class DefaultDatabase extends Database {
     }
 
     @Override
-    public Table getTable(String catalog, String schema, String tableName) {
+    public Table getTable(String catalog, String schema, String tableName) throws SQLException {
         ResultSet rs = null;
         Table table = null;
+        String schemaPattern = null;
         try {
-            rs = connection.getMetaData().getTables(catalog, schema, tableName,
-                                                    new String[] { "TABLE", "VIEW", "ALIAS", "SYNONYM" });
+            if(StringUtil.isNotEmpty(schema)){
+                schemaPattern = schema;
+            }
+            rs = connection.getMetaData().getTables(catalog, schemaPattern, tableName,
+                                                    new String[] { "TABLE", "VIEW"});
             if (rs.next()) {
                 table = new Table();
                 table.setCatalog(rs.getString("TABLE_CAT"));
-                table.setSchema(schema);
+                table.setSchema(rs.getString("TABLE_SCHEM"));
                 table.setTableName(tableName);
                 table.setRemarks(rs.getString("REMARKS"));
                 table.setTableType(rs.getString("TABLE_TYPE"));
@@ -37,17 +41,17 @@ public class DefaultDatabase extends Database {
                 introspectIndex(table);
             }
         } catch (SQLException e) {
-
+            throw e;
         } finally {
             close(rs);
         }
         return table;
     }
 
-    protected void introspectPrimaryKeys(Table table) {
+    protected void introspectPrimaryKeys(Table table) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = connection.getMetaData().getPrimaryKeys(null, null, table.getTableName());
+            rs = connection.getMetaData().getPrimaryKeys(null, table.getSchema(), table.getTableName());
             while (rs.next()) {
                 String columnName = rs.getString("COLUMN_NAME");
                 Column column = table.getColumn(columnName);
@@ -58,16 +62,16 @@ public class DefaultDatabase extends Database {
                 column.setPrimaryKey(true);
             }
         } catch (SQLException e) {
-
+            throw e;
         } finally {
             close(rs);
         }
     }
 
-    protected void introspectColumns(Table table) {
+    protected void introspectColumns(Table table) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = connection.getMetaData().getColumns(null, null, table.getTableName(), "%");
+            rs = connection.getMetaData().getColumns(null, table.getSchema(), table.getTableName(), "%");
             while (rs.next()) {
                 String columnName = rs.getString("COLUMN_NAME");// 获得字段名称
                 if (StringUtil.isEmpty(columnName)) {
@@ -91,17 +95,17 @@ public class DefaultDatabase extends Database {
                 column.setJavaProperty(StringUtil.getCamelCaseString(columnName, false));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         } finally {
             close(rs);
         }
     }
 
     // 获得外键的信息
-    protected void introspectForeignKeys(Table table) {
+    protected void introspectForeignKeys(Table table) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = connection.getMetaData().getImportedKeys(null, null, table.getTableName());
+            rs = connection.getMetaData().getImportedKeys(null, table.getSchema(), table.getTableName());
             while (rs.next()) {
                 String columnName = rs.getString("FKCOLUMN_NAME");
                 if (StringUtil.isEmpty(columnName)) {
@@ -117,17 +121,17 @@ public class DefaultDatabase extends Database {
                 }
             }
         } catch (SQLException e) {
-
+            throw e;
         } finally {
             close(rs);
         }
     }
 
     // 获得索引
-    protected void introspectIndex(Table table) {
+    protected void introspectIndex(Table table) throws SQLException {
         ResultSet rs = null;
         try {
-            rs = connection.getMetaData().getIndexInfo(null, null, table.getTableName(), true, true);
+            rs = connection.getMetaData().getIndexInfo(null, table.getSchema(), table.getTableName(), true, true);
             while (rs.next()) {
                 String columnName = rs.getString("COLUMN_NAME");
                 if (StringUtil.isEmpty(columnName)) {
@@ -139,7 +143,7 @@ public class DefaultDatabase extends Database {
                 }
             }
         } catch (SQLException e) {
-
+            throw e;
         } finally {
             close(rs);
         }

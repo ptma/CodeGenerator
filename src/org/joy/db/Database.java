@@ -18,7 +18,7 @@ public abstract class Database {
         this.typeMapping = typeMapping;
     }
 
-    public abstract Table getTable(String catalog, String schema, String tableName);
+    public abstract Table getTable(String catalog, String schema, String tableName) throws SQLException;
 
     public Connection getConnection() {
         return connection;

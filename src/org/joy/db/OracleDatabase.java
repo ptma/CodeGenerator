@@ -19,7 +19,7 @@ public class OracleDatabase extends DefaultDatabase {
     }
 
     @Override
-    public Table getTable(String catalog, String schema, String tableName) {
+    public Table getTable(String catalog, String schema, String tableName) throws SQLException {
         Table table = super.getTable(catalog, schema, tableName);
         if (table != null) {
             introspectTableComments(table);
@@ -28,7 +28,7 @@ public class OracleDatabase extends DefaultDatabase {
         return table;
     }
 
-    public void introspectTableComments(Table table) {
+    public void introspectTableComments(Table table) throws SQLException {
         PreparedStatement psmt = null;
         ResultSet rs = null;
         try {
@@ -39,14 +39,14 @@ public class OracleDatabase extends DefaultDatabase {
                 table.setRemarks(rs.getString("COMMENTS"));
             }
         } catch (SQLException e) {
-
+            throw e;
         } finally {
             close(rs);
             close(psmt);
         }
     }
 
-    public void introspectTableColumnsComments(Table table) {
+    public void introspectTableColumnsComments(Table table) throws SQLException {
         PreparedStatement psmt = null;
         ResultSet rs = null;
         try {
@@ -61,7 +61,7 @@ public class OracleDatabase extends DefaultDatabase {
                 }
             }
         } catch (SQLException e) {
-
+            throw e;
         } finally {
             close(rs);
             close(psmt);

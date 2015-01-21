@@ -293,7 +293,7 @@ public class Configuration {
             t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             t.transform(ds, sr);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
