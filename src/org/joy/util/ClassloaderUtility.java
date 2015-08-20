@@ -20,7 +20,8 @@ public class ClassloaderUtility {
 
         if (entries != null) {
             for (String classPathEntry : entries) {
-                file = new File(basePath + classPathEntry);
+                String jarPath = (basePath + classPathEntry).replaceAll("%20", " ");
+                file = new File(jarPath);
                 System.out.println("Loading jar : " + file.getPath());
                 if (!file.exists()) {
                     throw new RuntimeException(Messages.getString("RuntimeError.4", classPathEntry));
