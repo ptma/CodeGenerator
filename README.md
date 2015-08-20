@@ -35,6 +35,9 @@ CodeGenerator
 ```
 
 ##模板中可用的变量和方法
+    String       tagertProject       目标工程路径(代码保存的基准路径)
+    String       basePackage         基准包
+    String       moduleName          模块名
 ### table 对象
 ####属性
     String       tableName           表名
