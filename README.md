@@ -64,6 +64,10 @@ CodeGenerator
 
     boolean      hasBigDecimalColumn 是否有 BigDecimal 字段
 
+    boolean      hasNotNullColumn    是否有非空的 String 字段
+
+    boolean      hasNotBlankColumn   是否有非空的基本类型字段
+
 ### column
 ####属性
     String	columnName       字段名
@@ -117,7 +121,7 @@ CodeGenerator
 
     boolean isDate()        是否有日期类型，含Date、Timestamp、Time
 
-    public boolean isBLOB() 是否有 BLOB、CLOB、LONGVARCHAR、LONGVARBINARY或VARBINARY
+    boolean isBLOB() 是否有 BLOB、CLOB、LONGVARCHAR、LONGVARBINARY或VARBINARY
 
 ##作者
 ptma@163.com

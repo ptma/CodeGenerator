@@ -100,7 +100,7 @@ public class Column implements java.io.Serializable, Cloneable {
     }
 
     public String getRemarks() {
-        return remarks == null ? "" : remarks;
+        return remarks == null ? "" : remarks.trim();
     }
 
     public boolean isHasRemarks() {

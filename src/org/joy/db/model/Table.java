@@ -49,7 +49,7 @@ public class Table implements java.io.Serializable, Cloneable {
     }
 
     public String getRemarks() {
-        return remarks == null ? "" : remarks;
+        return remarks == null ? "" : remarks.trim();
     }
 
     public boolean isHasRemarks() {
@@ -163,6 +163,24 @@ public class Table implements java.io.Serializable, Cloneable {
     public boolean isHasBigDecimalColumn() {
         for (Column column : getColumns()) {
             if (column.isBigDecimal()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isHasNotNullColumn() {
+        for (Column column : getColumns()) {
+            if (!column.isNullable() && !column.isString()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isHasNotBlankColumn() {
+        for (Column column : getColumns()) {
+            if (!column.isNullable() && column.isString()) {
                 return true;
             }
         }
