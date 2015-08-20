@@ -89,11 +89,14 @@ public class DefaultDatabase extends Database {
                 column.setDefaultValue(rs.getString("COLUMN_DEF"));
                 column.setDecimalDigits(rs.getInt("DECIMAL_DIGITS"));
                 column.setRemarks(rs.getString("REMARKS"));
+                column.setAutoincrement(rs.getBoolean("IS_AUTOINCREMENT"));
+
                 column.setJdbcTypeName(JdbcTypeResolver.getJdbcTypeName(column.getJdbcType()));
                 column.setJavaType(typeMapping.calculateJavaType(column));
                 column.setFullJavaType(typeMapping.calculateFullJavaType(column));
                 column.setJavaProperty(StringUtil.getCamelCaseString(columnName, false));
             }
+
         } catch (SQLException e) {
             throw e;
         } finally {
@@ -116,8 +119,8 @@ public class DefaultDatabase extends Database {
                 Column column = table.getColumn(columnName);
                 if (column != null) {
                     column.setForeignKey(true);
-                    column.setTargetTableName(pkTableName);
-                    column.setTargetColumnName(pkColumnName);
+                    column.setPkTableName(pkTableName);
+                    column.setPkColumnName(pkColumnName);
                 }
             }
         } catch (SQLException e) {

@@ -12,8 +12,10 @@ public class Column implements java.io.Serializable, Cloneable {
     private boolean           isPrimaryKey;
 
     private boolean           isForeignKey;
-    private String            targetTableName;
-    private String            targetColumnName;
+
+    private String            pkTableName;
+
+    private String            pkColumnName;
 
     private int               size;
 
@@ -22,6 +24,8 @@ public class Column implements java.io.Serializable, Cloneable {
     private boolean           nullable;
 
     private boolean           unique;
+
+    private boolean           autoincrement;
 
     private String            defaultValue;
 
@@ -186,14 +190,26 @@ public class Column implements java.io.Serializable, Cloneable {
 
     public String getGetterMethodName() {
         if (JavaTypeResolver.isBoolean(javaType)) {
-            return "is" + StringUtil.getCamelCaseString(columnName, true);
+            return "is" + getMethodName();
         } else {
-            return "get" + StringUtil.getCamelCaseString(columnName, true);
+            return "get" + getMethodName();
         }
     }
 
     public String getSetterMethodName() {
-        return "set" + StringUtil.getCamelCaseString(columnName, true);
+        return "set" + getMethodName();
+    }
+
+    private String getMethodName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(javaProperty);
+        if (sb.length() > 1) {
+            char ch = sb.charAt(1);
+            if (Character.isLowerCase(ch)) {
+                sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+            }
+        }
+        return sb.toString();
     }
 
     public String getFullJavaType() {
@@ -212,27 +228,32 @@ public class Column implements java.io.Serializable, Cloneable {
         this.editor = editor;
     }
 
-    public String getTargetTableName() {
-        return targetTableName;
+    public String getPkTableName() {
+        return pkTableName;
     }
 
-
-    public void setTargetTableName(String targetTableName) {
-        this.targetTableName = targetTableName;
+    public void setPkTableName(String pkTableName) {
+        this.pkTableName = pkTableName;
     }
 
-
-    public String getTargetColumnName() {
-        return targetColumnName;
+    public String getPkColumnName() {
+        return pkColumnName;
     }
 
-
-    public void setTargetColumnName(String targetColumnName) {
-        this.targetColumnName = targetColumnName;
+    public void setPkColumnName(String pkColumnName) {
+        this.pkColumnName = pkColumnName;
     }
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    public boolean isAutoincrement() {
+        return autoincrement;
+    }
+
+    public void setAutoincrement(boolean autoincrement) {
+        this.autoincrement = autoincrement;
     }
 }

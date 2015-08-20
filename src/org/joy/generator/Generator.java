@@ -67,14 +67,17 @@ import org.joy.util.StringUtil;
 
 public class Generator extends JFrame {
 
-    private static final long      serialVersionUID = -7813705897974255551L;
+    private static final long      serialVersionUID    = -7813705897974255551L;
 
-    private static Font            font             = new Font("宋体", Font.PLAIN, 12);
-    private String[]               headers          = { "字段名", "字段类型", "JAVA类型", "大小", "主键", "唯一", "外键", "可空", "默认值",
-                        "注释"                       };
+    private static Font            font                = new Font("宋体", Font.PLAIN, 12);
+    private String[]               headers             = { "字段名", "字段类型", "JAVA类型", "大小", "主键", "唯一", "自增", "外键", "可空",
+                        "默认值", "注释"                   };
+    public static final int        IDX_COLUMN_JAVATYPE = 2;
+    public static final int        IDX_COLUMN_NULLABLE = 8;
+    public static final int        IDX_COLUMN_REMARK = 10;
 
     private JPanel                 contentPane;
-    private JSplitPane      contentSplitPane;
+    private JSplitPane             contentSplitPane;
     private JMenuItem              mntmConnect;
     private JMenuItem              mntmDisconnect;
 
@@ -84,9 +87,9 @@ public class Generator extends JFrame {
     private DefaultMutableTreeNode tablesNode;
     private DefaultMutableTreeNode viewsNode;
 
-    private ImageIcon              folderIcon       = createImageIcon("icon/folder.png");
-    private ImageIcon              tableIcon        = createImageIcon("icon/table.png");
-    private ImageIcon              viewIcon         = createImageIcon("icon/view.png");
+    private ImageIcon              folderIcon          = createImageIcon("icon/folder.png");
+    private ImageIcon              tableIcon           = createImageIcon("icon/table.png");
+    private ImageIcon              viewIcon            = createImageIcon("icon/view.png");
 
     private JPopupMenu             tablesTreePopupMenu;
     private JMenuItem              mntmTableInfo;
@@ -300,8 +303,6 @@ public class Generator extends JFrame {
         btnGenerate.setEnabled(false);
         rightTopPanel.add(btnGenerate);
 
-
-
         mntmConnect.setEnabled(true);
         mntmDisconnect.setEnabled(false);
         InitGlobalFont(font);
@@ -335,7 +336,7 @@ public class Generator extends JFrame {
         try {
             tablesNode.removeAllChildren();
             viewsNode.removeAllChildren();
-            if(StringUtil.isNotEmpty(schema)){
+            if (StringUtil.isNotEmpty(schema)) {
                 schemaPattern = schema;
             }
             ResultSet rs = connection.getMetaData().getTables(null, schemaPattern, "%", null);
@@ -344,7 +345,7 @@ public class Generator extends JFrame {
                 DefaultMutableTreeNode tableNode;
                 String tableSchema = rs.getString(2);
                 String tableName = rs.getString(3);
-                if(StringUtil.isNotEmpty(tableSchema)){
+                if (StringUtil.isNotEmpty(tableSchema)) {
                     tableName = tableSchema + "." + tableName;
                 }
                 if ("VIEW".equalsIgnoreCase(rs.getString(4))) {
@@ -508,7 +509,7 @@ public class Generator extends JFrame {
             private static final long serialVersionUID = 880033063879582590L;
 
             public boolean isCellEditable(int row, int column) {
-                if (column == 2 || column == 7 || column == 9) {
+                if (column == IDX_COLUMN_JAVATYPE || column == IDX_COLUMN_NULLABLE || column == IDX_COLUMN_REMARK) {
                     return true;
                 } else return false;
             }
@@ -521,11 +522,11 @@ public class Generator extends JFrame {
                     String value = tableGrid.getValueAt(e.getLastRow(), e.getColumn()).toString();
                     Column column = tableModel.getColumn(columnName);
                     if (column != null) {
-                        if (e.getColumn() == 2) {
+                        if (e.getColumn() == IDX_COLUMN_JAVATYPE) {
                             column.setJavaType(value);
-                        } else if (e.getColumn() == 7) {
+                        } else if (e.getColumn() == IDX_COLUMN_NULLABLE) {
                             column.setNullable(Boolean.parseBoolean(value));
-                        } else if (e.getColumn() == 9) {
+                        } else if (e.getColumn() == IDX_COLUMN_REMARK) {
                             column.setRemarks(value);
                         }
                     }
@@ -535,7 +536,7 @@ public class Generator extends JFrame {
         tableGrid.setModel(tableGridModel);
         tableGrid.setRowHeight(22);
 
-        ((EditableTable) tableGrid).setComboCell(2, new ComboBoxEditor(typeMapping.getAllJavaTypes()));// 第2列为下拉
+        ((EditableTable) tableGrid).setComboCell(IDX_COLUMN_JAVATYPE, new ComboBoxEditor(typeMapping.getAllJavaTypes()));// 第2列为下拉
 
         resizeTableGrid(true);
     }
@@ -550,8 +551,8 @@ public class Generator extends JFrame {
             String nodeText = ((TreeNodeData) selNode.getUserObject()).getText();
             String tableSchema = null;
             String tableName = nodeText;
-            if (nodeText.indexOf(".")>0) {
-                tableName = nodeText.substring(nodeText.indexOf(".")+1);
+            if (nodeText.indexOf(".") > 0) {
+                tableName = nodeText.substring(nodeText.indexOf(".") + 1);
                 tableSchema = nodeText.substring(0, nodeText.indexOf("."));
             }
             loadTableGridData(tableSchema, tableName);
@@ -585,6 +586,7 @@ public class Generator extends JFrame {
                 cellData[row][col++] = item.isPrimaryKey();
 
                 cellData[row][col++] = item.isUnique();
+                cellData[row][col++] = item.isAutoincrement();
                 cellData[row][col++] = item.isForeignKey();
                 cellData[row][col++] = item.isNullable();
                 cellData[row][col++] = item.getDefaultValue();

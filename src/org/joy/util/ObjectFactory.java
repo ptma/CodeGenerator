@@ -31,7 +31,7 @@ public class ObjectFactory {
                 clazz = Class.forName(type, true, classLoader);
                 return clazz;
             } catch (Throwable e) {
-
+                // Ignore
             }
         }
 
