@@ -47,14 +47,18 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.log4j.Logger;
 import org.joy.config.Configuration;
 import org.joy.config.JdbcDrivers;
 import org.joy.config.model.DatabaseElement;
 import org.joy.config.model.DriverInfo;
+import org.joy.exception.ApplicationException;
 import org.joy.util.StringUtil;
 
 
 public class DbManagementDialog extends JDialog {
+
+    private static final Logger LOGGER           = Logger.getLogger(DbManagementDialog.class);
 
     private static final long serialVersionUID = -8869055101570094777L;
 
@@ -80,7 +84,6 @@ public class DbManagementDialog extends JDialog {
     public DbManagementDialog(Configuration configuration){
         this.configuration = configuration;
         setModal(true);
-        //setModalityType(ModalityType.APPLICATION_MODAL);
         setTitle("数据库连接");
         setResizable(false);
         setBounds(100, 100, 561, 344);
@@ -97,27 +100,29 @@ public class DbManagementDialog extends JDialog {
 
 
 
-        GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
-        gl_contentPanel.setHorizontalGroup(
-            gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-                .addGroup(gl_contentPanel.createSequentialGroup()
+        GroupLayout glContentPanel = new GroupLayout(contentPanel);
+        glContentPanel.setHorizontalGroup(
+            glContentPanel.createParallelGroup(Alignment.TRAILING)
+                .addGroup(glContentPanel.createSequentialGroup()
                     .addComponent(leftScrollPane, GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(rightPane, GroupLayout.PREFERRED_SIZE, 395, GroupLayout.PREFERRED_SIZE))
         );
-        gl_contentPanel.setVerticalGroup(
-            gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+        glContentPanel.setVerticalGroup(
+            glContentPanel.createParallelGroup(Alignment.TRAILING)
                 .addComponent(leftScrollPane, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addComponent(rightPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
         );
 
         historyList = new JList();
         historyList.addListSelectionListener(new ListSelectionListener() {
+            @Override
             public void valueChanged(ListSelectionEvent e) {
-                hisListChange(e);
+                hisListChange();
             }
         });
         historyList.addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
                 listDoubleClick(e);
             }
@@ -177,40 +182,43 @@ public class DbManagementDialog extends JDialog {
         lblSchema.setBounds(10, 168, 54, 15);
         rightPane.add(lblSchema);
         driverComboBox.addItemListener(new ItemListener() {
+            @Override
             public void itemStateChanged(ItemEvent e) {
                 driverComboBoxChange(e);
             }
         });
-        contentPanel.setLayout(gl_contentPanel);
+        contentPanel.setLayout(glContentPanel);
 
         JPanel buttonPane = new JPanel();
         getContentPane().add(buttonPane, BorderLayout.SOUTH);
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
 
         JPanel bottomLeftPane = new JPanel();
-        FlowLayout fl_bottomLeftPane = (FlowLayout) bottomLeftPane.getLayout();
-        fl_bottomLeftPane.setAlignment(FlowLayout.LEFT);
+        FlowLayout flBottomLeftPane = (FlowLayout) bottomLeftPane.getLayout();
+        flBottomLeftPane.setAlignment(FlowLayout.LEFT);
         buttonPane.add(bottomLeftPane);
 
         JButton btnSave = new JButton("保存");
         btnSave.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                saveButtonClick(e);
+                saveButtonClick();
             }
         });
         bottomLeftPane.add(btnSave);
 
         JButton btnDelete = new JButton("删除");
         btnDelete.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                deleteButtonClick(e);
+                deleteButtonClick();
             }
         });
         bottomLeftPane.add(btnDelete);
 
         JPanel bottomRightPane = new JPanel();
-        FlowLayout fl_bottomRightPane = (FlowLayout) bottomRightPane.getLayout();
-        fl_bottomRightPane.setAlignment(FlowLayout.RIGHT);
+        FlowLayout flBottomRightPane = (FlowLayout) bottomRightPane.getLayout();
+        flBottomRightPane.setAlignment(FlowLayout.RIGHT);
         buttonPane.add(bottomRightPane);
 
         JButton btnTest = new JButton("测试连接...");
@@ -219,8 +227,9 @@ public class DbManagementDialog extends JDialog {
         JButton btnOK = new JButton("确定");
         bottomRightPane.add(btnOK);
         btnOK.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                okButtonClick(e);
+                okButtonClick();
             }
         });
         btnOK.setActionCommand("OK");
@@ -230,6 +239,7 @@ public class DbManagementDialog extends JDialog {
         JButton btnCancel = new JButton("取消");
         bottomRightPane.add(btnCancel);
         btnCancel.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 doClose(RET_CANCEL);
             }
@@ -237,8 +247,9 @@ public class DbManagementDialog extends JDialog {
         btnCancel.setActionCommand("Cancel");
 
         btnTest.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                testButtonClick(e, true);
+                testButtonClick(true);
             }
         });
 
@@ -266,15 +277,15 @@ public class DbManagementDialog extends JDialog {
 
     private void loadListAndCombobox() {
         Map<String, DriverInfo> driverMap = JdbcDrivers.getJdbcDriversMap();
-        Object[] key_arr = driverMap.keySet().toArray();
-        Arrays.sort(key_arr);
-        for  (Object key : key_arr) {
+        Object[] keyArray = driverMap.keySet().toArray();
+        Arrays.sort(keyArray);
+        for  (Object key : keyArray) {
             driverComboBox.addItem(driverMap.get(key));
         }
         historyList.setListData(configuration.getConnectionHistory().toArray());
     }
 
-    private void hisListChange(ListSelectionEvent evt){
+    private void hisListChange(){
         DatabaseElement selDb = (DatabaseElement) historyList.getSelectedValue();
         if(selDb !=null){
             for(int i=0;i<driverComboBox.getItemCount();i++){
@@ -300,7 +311,36 @@ public class DbManagementDialog extends JDialog {
         }
     }
 
-    private DatabaseElement testButtonClick(ActionEvent evt, boolean showSuccessInfomationDialog) {
+    private DatabaseElement doConnecting(String name, String driverClass, String connectionUrl, String username, String password,
+                           String schema, boolean testing){
+        Connection conn = null;
+        try {
+            DatabaseElement dbItem = new DatabaseElement(name, driverClass, connectionUrl, username, password, schema);
+            conn = dbItem.connect();
+            if (conn != null) {
+                if (testing) {
+                    JOptionPane.showMessageDialog(this, "连接成功.", "错误", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "连接失败.", "错误", JOptionPane.INFORMATION_MESSAGE);
+            }
+            return dbItem;
+        } catch (ApplicationException e) {
+            LOGGER.info(e);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if(conn!=null){
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                LOGGER.info(e);
+            }
+        }
+        return null;
+    }
+
+    private DatabaseElement testButtonClick(boolean showSuccessInfomationDialog) {
         DriverInfo selectedItem = (DriverInfo) driverComboBox.getSelectedItem();
         String name = textName.getText();
         String url = textUrl.getText();
@@ -319,35 +359,9 @@ public class DbManagementDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "请输入 Username.", "提示", JOptionPane.INFORMATION_MESSAGE);
             return null;
         }
-//        if (StringUtil.isEmpty(password)) {
-//            JOptionPane.showMessageDialog(this, "请输入 Password.", "提示", JOptionPane.INFORMATION_MESSAGE);
-//            return null;
-//        }
-        Connection conn = null;
-        try {
-            DatabaseElement dbItem = new DatabaseElement(name, selectedItem.getDriverClass(), url, username, password, schema);
-            conn = dbItem.connect();
-            if (conn != null) {
-                if (showSuccessInfomationDialog) {
-                    JOptionPane.showMessageDialog(this, "连接成功.", "错误", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "连接失败.", "错误", JOptionPane.INFORMATION_MESSAGE);
-            }
-            return dbItem;
-        } catch (ClassNotFoundException cfe) {
-            JOptionPane.showMessageDialog(this, "找不到你选择的 JDBC Driver 类.", "错误", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            try {
-                if(conn!=null){
-                    conn.close();
-                }
-            } catch (SQLException e) {
-            }
-        }
-        return null;
+
+
+        return doConnecting(name, selectedItem.getDriverClass(), url, username, password, schema, showSuccessInfomationDialog);
     }
 
     public DatabaseElement getDatabase(){
@@ -356,12 +370,12 @@ public class DbManagementDialog extends JDialog {
 
     private void listDoubleClick(java.awt.event.MouseEvent evt) {
         if (evt.getClickCount() == 2) {
-            okButtonClick(null);
+            okButtonClick();
         }
     }
 
-    private void okButtonClick(ActionEvent evt) {
-        database = testButtonClick(evt, false);
+    private void okButtonClick() {
+        database = testButtonClick(false);
         if (database == null) {
             return;
         }
@@ -369,7 +383,7 @@ public class DbManagementDialog extends JDialog {
         doClose(RET_OK);
     }
 
-    private void saveButtonClick(ActionEvent evt) {
+    private void saveButtonClick() {
         DriverInfo selectedItem = (DriverInfo) driverComboBox.getSelectedItem();
         String name = textName.getText();
         String url = textUrl.getText();
@@ -383,7 +397,7 @@ public class DbManagementDialog extends JDialog {
         historyList.setListData(configuration.getConnectionHistory().toArray());
     }
 
-    private void deleteButtonClick(ActionEvent evt) {
+    private void deleteButtonClick() {
         DatabaseElement selDb = (DatabaseElement) historyList.getSelectedValue();
         if(selDb!=null){
             configuration.removeHistory(selDb);

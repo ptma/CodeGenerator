@@ -3,79 +3,84 @@ package org.joy.task;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Task extends Thread {
-  private boolean finished = false;
-  private Object status = null;
-  private Object result = null;
-  private Exception error = null;
-  private boolean cancelled = false;
-  private List<TaskListener> listeners = new ArrayList<TaskListener>();
+public abstract class Task implements Runnable {
 
-  public synchronized void addTaskListener(TaskListener listener) {
-    ArrayList<TaskListener> newListeners = new ArrayList<TaskListener>(listeners);
-    newListeners.add(listener);
-    listeners = newListeners;
-  }
+    private boolean            finished  = false;
+    private Object             status    = null;
+    private Object             result    = null;
+    private Exception          error     = null;
+    private boolean            cancelled = false;
+    private List<TaskListener> listeners = new ArrayList<TaskListener>();
 
-  public synchronized void removeTaskListener(TaskListener listener) {
-    ArrayList<TaskListener> newListeners = new ArrayList<TaskListener>(listeners);
-    newListeners.remove(listener);
-    listeners = newListeners;
-  }
+    public synchronized void addTaskListener(TaskListener listener) {
+        ArrayList<TaskListener> newListeners = new ArrayList<TaskListener>(listeners);
+        newListeners.add(listener);
+        listeners = newListeners;
+    }
 
-  protected synchronized void reportFinished() {
-    finished = true;
-    for (TaskListener listener : listeners)
-      listener.taskFinished();
-  }
+    public synchronized void removeTaskListener(TaskListener listener) {
+        ArrayList<TaskListener> newListeners = new ArrayList<TaskListener>(listeners);
+        newListeners.remove(listener);
+        listeners = newListeners;
+    }
 
-  protected synchronized void reportStatus(Object obj) {
-    status = obj;
-    for (TaskListener listener : listeners)
-      listener.taskStatus(obj);
-  }
+    protected synchronized void reportFinished() {
+        finished = true;
+        for (TaskListener listener : listeners) {
+            listener.taskFinished();
+        }
+    }
 
-  protected synchronized void reportResult(Object obj) {
-    result = obj;
-    for (TaskListener listener : listeners)
-      listener.taskResult(obj);
-  }
+    protected synchronized void reportStatus(Object obj) {
+        status = obj;
+        for (TaskListener listener : listeners) {
+            listener.taskStatus(obj);
+        }
+    }
 
-  protected synchronized void reportError(Exception e) {
-    error = e;
-    for (TaskListener listener : listeners)
-      listener.taskError(e);
-  }
+    protected synchronized void reportResult(Object obj) {
+        result = obj;
+        for (TaskListener listener : listeners){
+            listener.taskResult(obj);
+        }
+    }
 
-  public synchronized boolean isFinished() {
-    return finished;
-  }
+    protected synchronized void reportError(Exception e) {
+        error = e;
+        for (TaskListener listener : listeners){
+            listener.taskError(e);
+        }
+    }
 
-  public synchronized Object getStatus() {
-    return status;
-  }
+    public synchronized boolean isFinished() {
+        return finished;
+    }
 
-  public synchronized boolean hasResult() {
-    return result != null;
-  }
+    public synchronized Object getStatus() {
+        return status;
+    }
 
-  public synchronized Object getResult() {
-    return result;
-  }
+    public synchronized boolean hasResult() {
+        return result != null;
+    }
 
-  public synchronized boolean hasError() {
-    return error != null;
-  }
+    public synchronized Object getResult() {
+        return result;
+    }
 
-  public synchronized Exception getError() {
-    return error;
-  }
+    public synchronized boolean hasError() {
+        return error != null;
+    }
 
-  public synchronized void cancel() {
-    cancelled = true;
-  }
+    public synchronized Exception getError() {
+        return error;
+    }
 
-  public synchronized boolean isCancelled() {
-    return cancelled;
-  }
+    public synchronized void cancel() {
+        cancelled = true;
+    }
+
+    public synchronized boolean isCancelled() {
+        return cancelled;
+    }
 }

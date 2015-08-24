@@ -30,77 +30,101 @@ public class JavaTypeResolver {
     private static Map<Integer, String> typeMap;
     private static Map<Integer, String> fullTypeMap;
 
+    private static final String         TYPE_BYTE         = "Byte";
+    private static final String         TYPE_SHORT        = "Short";
+    private static final String         TYPE_INTEGER      = "Integer";
+    private static final String         TYPE_LONG         = "Long";
+    private static final String         TYPE_FLOAT        = "Float";
+    private static final String         TYPE_DOUBLE       = "Double";
+    private static final String         TYPE_STRING       = "String";
+    private static final String         TYPE_BOOLEAN      = "Boolean";
+    private static final String         TYPE_OBJECT       = "Object";
+    private static final String         TYPE_BYTE_ARRAY   = "byte[]";
+
+    private static final String         FULL_TYPE_BYTE    = "java.lang.Byte";
+    private static final String         FULL_TYPE_SHORT   = "java.lang.Short";
+    private static final String         FULL_TYPE_INTEGER = "java.lang.Integer";
+    private static final String         FULL_TYPE_LONG    = "java.lang.Long";
+    private static final String         FULL_TYPE_FLOAT   = "java.lang.Float";
+    private static final String         FULL_TYPE_DOUBLE  = "java.lang.Double";
+    private static final String         FULL_TYPE_STRING  = "java.lang.String";
+    private static final String         FULL_TYPE_BOOLEAN = "java.lang.Boolean";
+    private static final String         FULL_TYPE_OBJECT  = "java.lang.Object";
+    private static final String         FULL_TYPE_DATE    = "java.util.Date";
+
     static {
         typeMap = new HashMap<Integer, String>();
 
-        typeMap.put(Types.ARRAY, "Object");
-        typeMap.put(Types.BIGINT, "Long");
-        typeMap.put(Types.BINARY, "byte[]");
-        typeMap.put(Types.BIT, "Boolean");
-        typeMap.put(Types.BLOB, "byte[]");
-        typeMap.put(Types.BOOLEAN, "Boolean");
-        typeMap.put(Types.CHAR, "String");
-        typeMap.put(Types.CLOB, "String");
-        typeMap.put(Types.DATALINK, "String");
+        typeMap.put(Types.ARRAY, TYPE_OBJECT);
+        typeMap.put(Types.BIGINT, TYPE_LONG);
+        typeMap.put(Types.BINARY, TYPE_BYTE_ARRAY);
+        typeMap.put(Types.BIT, TYPE_BOOLEAN);
+        typeMap.put(Types.BLOB, TYPE_BYTE_ARRAY);
+        typeMap.put(Types.BOOLEAN, TYPE_BOOLEAN);
+        typeMap.put(Types.CHAR, TYPE_STRING);
+        typeMap.put(Types.CLOB, TYPE_STRING);
+        typeMap.put(Types.DATALINK, TYPE_STRING);
         typeMap.put(Types.DATE, "Date");
-        typeMap.put(Types.DISTINCT, "Object");
-        typeMap.put(Types.DOUBLE, "Double");
-        typeMap.put(Types.FLOAT, "Double");
-        typeMap.put(Types.INTEGER, "Integer");
-        typeMap.put(Types.JAVA_OBJECT, "Object");
-        typeMap.put(Jdbc4Types.LONGNVARCHAR, "String");
-        typeMap.put(Types.LONGVARBINARY, "byte[]");
-        typeMap.put(Types.LONGVARCHAR, "String");
-        typeMap.put(Jdbc4Types.NCHAR, "String");
-        typeMap.put(Jdbc4Types.NCLOB, "String");
-        typeMap.put(Jdbc4Types.NVARCHAR, "String");
-        typeMap.put(Types.NULL, "Object");
-        typeMap.put(Types.OTHER, "Object");
-        typeMap.put(Types.REAL, "Float");
-        typeMap.put(Types.REF, "Object");
-        typeMap.put(Types.SMALLINT, "Short");
-        typeMap.put(Types.STRUCT, "Object");
+        typeMap.put(Types.DISTINCT, TYPE_OBJECT);
+        typeMap.put(Types.DOUBLE, TYPE_DOUBLE);
+        typeMap.put(Types.FLOAT, TYPE_DOUBLE);
+        typeMap.put(Types.INTEGER, TYPE_INTEGER);
+        typeMap.put(Types.JAVA_OBJECT, TYPE_OBJECT);
+        typeMap.put(Jdbc4Types.LONGNVARCHAR, TYPE_STRING);
+        typeMap.put(Types.LONGVARBINARY, TYPE_BYTE_ARRAY);
+        typeMap.put(Types.LONGVARCHAR, TYPE_STRING);
+        typeMap.put(Jdbc4Types.NCHAR, TYPE_STRING);
+        typeMap.put(Jdbc4Types.NCLOB, TYPE_STRING);
+        typeMap.put(Jdbc4Types.NVARCHAR, TYPE_STRING);
+        typeMap.put(Types.NULL, TYPE_OBJECT);
+        typeMap.put(Types.OTHER, TYPE_OBJECT);
+        typeMap.put(Types.REAL, TYPE_FLOAT);
+        typeMap.put(Types.REF, TYPE_OBJECT);
+        typeMap.put(Types.SMALLINT, TYPE_SHORT);
+        typeMap.put(Types.STRUCT, TYPE_OBJECT);
         typeMap.put(Types.TIME, "Date");
         typeMap.put(Types.TIMESTAMP, "Date");
-        typeMap.put(Types.TINYINT, "Byte");
-        typeMap.put(Types.VARBINARY, "byte[]");
-        typeMap.put(Types.VARCHAR, "String");
-
+        typeMap.put(Types.TINYINT, TYPE_BYTE);
+        typeMap.put(Types.VARBINARY, TYPE_BYTE_ARRAY);
+        typeMap.put(Types.VARCHAR, TYPE_STRING);
 
         fullTypeMap = new HashMap<Integer, String>();
 
-        fullTypeMap.put(Types.ARRAY, "java.lang.Object");
-        fullTypeMap.put(Types.BIGINT, "java.lang.Long");
-        fullTypeMap.put(Types.BINARY, "byte[]");
-        fullTypeMap.put(Types.BIT, "java.lang.Boolean");
-        fullTypeMap.put(Types.BLOB, "byte[]");
-        fullTypeMap.put(Types.BOOLEAN, "java.lang.Boolean");
-        fullTypeMap.put(Types.CHAR, "java.lang.String");
-        fullTypeMap.put(Types.CLOB, "java.lang.String");
-        fullTypeMap.put(Types.DATALINK, "java.lang.String");
-        fullTypeMap.put(Types.DATE, "java.sql.Date");
-        fullTypeMap.put(Types.DISTINCT, "java.lang.Object");
-        fullTypeMap.put(Types.DOUBLE, "java.lang.Double");
-        fullTypeMap.put(Types.FLOAT, "java.lang.Double");
-        fullTypeMap.put(Types.INTEGER, "java.lang.Integer");
-        fullTypeMap.put(Types.JAVA_OBJECT, "java.lang.Object");
-        fullTypeMap.put(Jdbc4Types.LONGNVARCHAR, "java.lang.String");
-        fullTypeMap.put(Types.LONGVARBINARY, "byte[]");
-        fullTypeMap.put(Types.LONGVARCHAR, "java.lang.String");
-        fullTypeMap.put(Jdbc4Types.NCHAR, "java.lang.String");
-        fullTypeMap.put(Jdbc4Types.NCLOB, "java.lang.String");
-        fullTypeMap.put(Jdbc4Types.NVARCHAR, "java.lang.String");
-        fullTypeMap.put(Types.NULL, "java.lang.Object");
-        fullTypeMap.put(Types.OTHER, "java.lang.Object");
-        fullTypeMap.put(Types.REAL, "java.lang.Float");
-        fullTypeMap.put(Types.REF, "java.lang.Object");
-        fullTypeMap.put(Types.SMALLINT, "java.lang.Short");
-        fullTypeMap.put(Types.STRUCT, "java.lang.Object");
-        fullTypeMap.put(Types.TIME, "java.sql.Date");
-        fullTypeMap.put(Types.TIMESTAMP, "java.sql.Date");
-        fullTypeMap.put(Types.TINYINT, "java.lang.Byte");
-        fullTypeMap.put(Types.VARBINARY, "byte[]");
-        fullTypeMap.put(Types.VARCHAR, "java.lang.String");
+        fullTypeMap.put(Types.ARRAY, FULL_TYPE_OBJECT);
+        fullTypeMap.put(Types.BIGINT, FULL_TYPE_LONG);
+        fullTypeMap.put(Types.BINARY, TYPE_BYTE_ARRAY);
+        fullTypeMap.put(Types.BIT, FULL_TYPE_BOOLEAN);
+        fullTypeMap.put(Types.BLOB, TYPE_BYTE_ARRAY);
+        fullTypeMap.put(Types.BOOLEAN, FULL_TYPE_BOOLEAN);
+        fullTypeMap.put(Types.CHAR, FULL_TYPE_STRING);
+        fullTypeMap.put(Types.CLOB, FULL_TYPE_STRING);
+        fullTypeMap.put(Types.DATALINK, FULL_TYPE_STRING);
+        fullTypeMap.put(Types.DATE, FULL_TYPE_DATE);
+        fullTypeMap.put(Types.DISTINCT, FULL_TYPE_OBJECT);
+        fullTypeMap.put(Types.DOUBLE, FULL_TYPE_DOUBLE);
+        fullTypeMap.put(Types.FLOAT, FULL_TYPE_DOUBLE);
+        fullTypeMap.put(Types.INTEGER, FULL_TYPE_INTEGER);
+        fullTypeMap.put(Types.JAVA_OBJECT, FULL_TYPE_OBJECT);
+        fullTypeMap.put(Jdbc4Types.LONGNVARCHAR, FULL_TYPE_STRING);
+        fullTypeMap.put(Types.LONGVARBINARY, TYPE_BYTE_ARRAY);
+        fullTypeMap.put(Types.LONGVARCHAR, FULL_TYPE_STRING);
+        fullTypeMap.put(Jdbc4Types.NCHAR, FULL_TYPE_STRING);
+        fullTypeMap.put(Jdbc4Types.NCLOB, FULL_TYPE_STRING);
+        fullTypeMap.put(Jdbc4Types.NVARCHAR, FULL_TYPE_STRING);
+        fullTypeMap.put(Types.NULL, FULL_TYPE_OBJECT);
+        fullTypeMap.put(Types.OTHER, FULL_TYPE_OBJECT);
+        fullTypeMap.put(Types.REAL, FULL_TYPE_FLOAT);
+        fullTypeMap.put(Types.REF, FULL_TYPE_OBJECT);
+        fullTypeMap.put(Types.SMALLINT, FULL_TYPE_SHORT);
+        fullTypeMap.put(Types.STRUCT, FULL_TYPE_OBJECT);
+        fullTypeMap.put(Types.TIME, FULL_TYPE_DATE);
+        fullTypeMap.put(Types.TIMESTAMP, FULL_TYPE_DATE);
+        fullTypeMap.put(Types.TINYINT, FULL_TYPE_BYTE);
+        fullTypeMap.put(Types.VARBINARY, TYPE_BYTE_ARRAY);
+        fullTypeMap.put(Types.VARCHAR, FULL_TYPE_STRING);
+    }
+
+    private JavaTypeResolver(){
     }
 
     public static String calculateJavaType(Column column) {
@@ -111,17 +135,8 @@ public class JavaTypeResolver {
             switch (column.getJdbcType()) {
                 case Types.DECIMAL:
                 case Types.NUMERIC:
-                    if (column.getDecimalDigits() > 0 || column.getSize() > 18 || forceBigDecimals) {
-                        answer = "BigDecimal";
-                    } else if (column.getSize() > 9) {
-                        answer = "Long";
-                    } else if (column.getSize() > 4) {
-                        answer = "Integer";
-                    } else {
-                        answer = "Short";
-                    }
+                    answer = calculateNumericType(column);
                     break;
-
                 default:
                     answer = null;
                     break;
@@ -131,6 +146,18 @@ public class JavaTypeResolver {
         }
 
         return answer;
+    }
+
+    private static String calculateNumericType(Column column) {
+        if (column.getDecimalDigits() > 0 || column.getSize() > 18 || forceBigDecimals) {
+            return "BigDecimal";
+        } else if (column.getSize() > 9) {
+            return TYPE_LONG;
+        } else if (column.getSize() > 4) {
+            return TYPE_INTEGER;
+        } else {
+            return TYPE_SHORT;
+        }
     }
 
     public static String calculateFullJavaType(Column column) {
@@ -141,15 +168,7 @@ public class JavaTypeResolver {
             switch (column.getJdbcType()) {
                 case Types.DECIMAL:
                 case Types.NUMERIC:
-                    if (column.getDecimalDigits() > 0 || column.getSize() > 18 || forceBigDecimals) {
-                        answer = "java.math.BigDecimal";
-                    } else if (column.getSize() > 9) {
-                        answer = "java.lang.Long";
-                    } else if (column.getSize() > 4) {
-                        answer = "java.lang.Integer";
-                    } else {
-                        answer = "java.lang.Short";
-                    }
+                    answer = calculateFullNumericType(column);
                     break;
 
                 default:
@@ -163,11 +182,23 @@ public class JavaTypeResolver {
         return answer;
     }
 
+    private static String calculateFullNumericType(Column column) {
+        if (column.getDecimalDigits() > 0 || column.getSize() > 18 || forceBigDecimals) {
+            return "java.math.BigDecimal";
+        } else if (column.getSize() > 9) {
+            return FULL_TYPE_LONG;
+        } else if (column.getSize() > 4) {
+            return FULL_TYPE_INTEGER;
+        } else {
+            return FULL_TYPE_SHORT;
+        }
+    }
+
     public static String[] getAllJavaTypes() {
         Set<String> javaTypeSet = new HashSet<String>();
         javaTypeSet.addAll(typeMap.values());
 
-        String[] values = new String[javaTypeSet.size()+1];
+        String[] values = new String[javaTypeSet.size() + 1];
         int index = 0;
         for (String itemValue : javaTypeSet) {
             values[index++] = itemValue;
@@ -176,50 +207,43 @@ public class JavaTypeResolver {
         return values;
     }
 
+    public static boolean isDouble(String javaType) {
+        return "double".equals(javaType) || FULL_TYPE_DOUBLE.equals(javaType);
+    }
+
     public static boolean isFloat(String javaType) {
-        if (javaType.endsWith("Float") || javaType.endsWith("Double") || javaType.endsWith("BigInteger")) {
-            return true;
-        }
-        if (javaType.endsWith("float") || javaType.endsWith("double") || javaType.endsWith("BigInteger")) {
-            return true;
-        }
-        return false;
+        return "float".equals(javaType) || FULL_TYPE_FLOAT.equals(javaType);
+    }
+
+    public static boolean isLong(String javaType) {
+        return "long".equals(javaType) || FULL_TYPE_LONG.equals(javaType);
+    }
+
+    public static boolean isShort(String javaType) {
+        return "short".equals(javaType) || FULL_TYPE_SHORT.equals(javaType);
+    }
+
+    public static boolean isByte(String javaType) {
+        return "byte".equals(javaType) || FULL_TYPE_BYTE.equals(javaType);
     }
 
     public static boolean isBigDecimal(String javaType) {
-        return javaType.endsWith("BigDecimal");
+        return "java.math.BigDecimal".equals(javaType);
     }
 
     public static boolean isInteger(String javaType) {
-        if (javaType.endsWith("Long") || javaType.endsWith("Integer") || javaType.endsWith("Short")
-            || javaType.endsWith("Byte")) {
-            return true;
-        }
-        if (javaType.endsWith("long") || javaType.endsWith("int") || javaType.endsWith("short")
-            || javaType.endsWith("byte")) {
-            return true;
-        }
-        return false;
+        return "int".equals(javaType) || FULL_TYPE_INTEGER.equals(javaType);
     }
 
     public static boolean isDate(String javaType) {
-        if (javaType.endsWith("Date") || javaType.endsWith("Timestamp") || javaType.endsWith("Time")) {
-            return true;
-        }
-        return false;
+        return javaType.endsWith("Date") || javaType.endsWith("Timestamp") || javaType.endsWith("Time");
     }
 
     public static boolean isString(String javaType) {
-        if (javaType.endsWith("String")) {
-            return true;
-        }
-        return false;
+        return FULL_TYPE_STRING.equals(javaType);
     }
 
     public static boolean isBoolean(String javaType) {
-        if (javaType.endsWith("Boolean") || javaType.endsWith("boolean")) {
-            return true;
-        }
-        return false;
+        return "boolean".equals(javaType) || FULL_TYPE_BOOLEAN.equals(javaType);
     }
 }

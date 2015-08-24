@@ -25,10 +25,6 @@ public class TemplateElement {
     private String encoding;
     private boolean selected;
 
-    public String getTemplateFile() {
-        return templateFile;
-    }
-
     public TemplateElement(String templateName, String engine, String templateFile, String targetPath, String targetFileName, String encoding){
         super();
         this.templateName = templateName;
@@ -41,6 +37,10 @@ public class TemplateElement {
 
     public void setTemplateFile(String templateFile) {
         this.templateFile = templateFile;
+    }
+
+    public String getTemplateFile() {
+        return templateFile;
     }
 
     public String getTargetPath() {

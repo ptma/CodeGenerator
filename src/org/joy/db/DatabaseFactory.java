@@ -23,6 +23,10 @@ import org.joy.config.TypeMapping;
 
 public class DatabaseFactory {
 
+    private DatabaseFactory() {
+
+    }
+
     public static Database createDatabase(Connection connection, TypeMapping typeMapping) throws SQLException {
         String dbProduct = connection.getMetaData().getDatabaseProductName();
         if(dbProduct.toLowerCase().contains("oracle")){

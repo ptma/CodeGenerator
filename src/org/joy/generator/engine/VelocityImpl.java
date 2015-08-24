@@ -35,18 +35,21 @@ import org.joy.util.StringUtil;
 
 public class VelocityImpl implements TemplateEngine {
 
+    private static final String ENCODING = "UTF-8";
+
     private static final VelocityEngine engine = new VelocityEngine();
 
     public VelocityImpl(String classPath){
         Properties props = new Properties();
-        props.setProperty(Velocity.INPUT_ENCODING, "UTF-8");// 设置输入字符集
-        props.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");// 设置输出字符集
-        props.setProperty(Velocity.ENCODING_DEFAULT, "UTF-8");
+        props.setProperty(Velocity.INPUT_ENCODING, ENCODING);
+        props.setProperty(Velocity.OUTPUT_ENCODING, ENCODING);
+        props.setProperty(Velocity.ENCODING_DEFAULT, ENCODING);
         props.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, NullLogChute.class.getName());
         props.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, classPath + "templates/velocity");
         engine.init(props);
     }
 
+    @Override
     public String processToString(Map<String, Object> model, String stringTemplate) throws TemplateEngineException {
         try {
             VelocityContext context = new VelocityContext(model);
@@ -58,6 +61,7 @@ public class VelocityImpl implements TemplateEngine {
         }
     }
 
+    @Override
     public void processToFile(Map<String, Object> model, TemplateElement templateElement)
                                                                                          throws TemplateEngineException {
         try {

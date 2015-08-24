@@ -21,10 +21,15 @@ import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+import org.joy.exception.AppRuntimeException;
+import org.joy.exception.ApplicationException;
 import org.joy.util.ObjectFactory;
 import org.joy.util.messgae.Messages;
 
 public class DatabaseElement implements Serializable, Comparable<DatabaseElement> {
+
+    private static final Logger LOGGER           = Logger.getLogger(DatabaseElement.class);
 
     private static final long serialVersionUID = -4793412674735445680L;
     private String            name;
@@ -65,7 +70,9 @@ public class DatabaseElement implements Serializable, Comparable<DatabaseElement
     }
 
     public void setName(String name) {
-        if (name == null || name.length() == 0) throw new NullPointerException("You must specify a name!");
+        if (name == null || name.length() == 0) {
+            throw new NullPointerException("You must specify a name!");
+        }
         this.name = name;
     }
 
@@ -74,7 +81,9 @@ public class DatabaseElement implements Serializable, Comparable<DatabaseElement
     }
 
     public void setDriverClass(String driverClass) {
-        if (driverClass == null) throw new NullPointerException("You must specify a driver!");
+        if (driverClass == null) {
+            throw new NullPointerException("You must specify a driver!");
+        }
         this.driverClass = driverClass;
     }
 
@@ -83,24 +92,31 @@ public class DatabaseElement implements Serializable, Comparable<DatabaseElement
     }
 
     public void setConnectionUrl(String connectionUrl) {
-        if (connectionUrl == null) throw new NullPointerException("You must specify a connection URL!");
+        if (connectionUrl == null) {
+            throw new NullPointerException("You must specify a connection URL!");
+        }
         this.connectionUrl = connectionUrl;
     }
 
     /**
      * Connects to the database. Attempts to load the driver and connect to this instance's url.
      */
-    public Connection connect() throws SQLException, ClassNotFoundException {
+    public Connection connect() throws ApplicationException {
         Driver driver = getDriver();
 
         Properties props = new Properties();
         props.setProperty("user", username);
         props.setProperty("password", password);
 
-        Connection conn = driver.connect(connectionUrl, props);
+        Connection conn;
+        try {
+            conn = driver.connect(connectionUrl, props);
+        } catch (SQLException e){
+            throw new AppRuntimeException(Messages.getString("RuntimeError.2"), e);
+        }
 
         if (conn == null) {
-            throw new SQLException(Messages.getString("RuntimeError.2")); //$NON-NLS-1$
+            throw new AppRuntimeException(Messages.getString("RuntimeError.2"));
         }
 
         return conn;
@@ -113,11 +129,13 @@ public class DatabaseElement implements Serializable, Comparable<DatabaseElement
             Class<?> clazz = ObjectFactory.externalClassForName(driverClass);
             driver = (Driver) clazz.newInstance();
         } catch (Exception e) {
-            throw new RuntimeException(Messages.getString("RuntimeError.3"), e);
+            LOGGER.info(e);
+            throw new AppRuntimeException(Messages.getString("RuntimeError.3"), e);
         }
         return driver;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof DatabaseElement)){
             return false;
@@ -128,14 +146,17 @@ public class DatabaseElement implements Serializable, Comparable<DatabaseElement
         return false;
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
 
+    @Override
     public int compareTo(DatabaseElement other) {
         return name.toLowerCase().compareTo(other.getName().toLowerCase());
     }
 
+    @Override
     public String toString() {
         return this.name;
     }

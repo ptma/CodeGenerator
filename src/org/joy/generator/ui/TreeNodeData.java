@@ -24,11 +24,11 @@ public class TreeNodeData implements Serializable {
   private static final long serialVersionUID = 6843072103831482105L;
 
   private String text;
-  
+
   private ImageIcon icon;
-  
+
   private String type;
-  
+
   public TreeNodeData(String text, ImageIcon icon, String type){
     this.text = text;
     this.icon = icon;
@@ -58,7 +58,8 @@ public class TreeNodeData implements Serializable {
   public void setType(String type) {
     this.type = type;
   }
-  
+
+  @Override
   public String toString(){
     return text;
   }

@@ -15,6 +15,8 @@
  */
 package org.joy.generator.engine;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,6 +33,8 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 
 public class FreeMarkerImpl implements TemplateEngine {
+
+    private static final Logger LOGGER = Logger.getLogger(FreeMarkerImpl.class);
 
     private Configuration config;
 
@@ -58,10 +62,11 @@ public class FreeMarkerImpl implements TemplateEngine {
             config.setSetting("time_format", "HH:mm:ss");
             config.setSetting("number_format", "0.######;");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e);
         }
     }
 
+    @Override
     public String processToString(Map<String, Object> model, String stringTemplate) throws TemplateEngineException {
         try {
             Configuration cfg = new Configuration();
@@ -77,6 +82,7 @@ public class FreeMarkerImpl implements TemplateEngine {
         }
     }
 
+    @Override
     public void processToFile(Map<String, Object> model, TemplateElement templateElement) throws TemplateEngineException {
         try {
             Template template = config.getTemplate(templateElement.getTemplateFile(), templateElement.getEncoding());

@@ -5,6 +5,10 @@ import java.util.Locale;
 
 public class StringUtil {
 
+    private StringUtil(){
+
+    }
+
     public static boolean isEmpty(String value) {
         return value == null || value.trim().length() == 0;
     }
@@ -30,7 +34,7 @@ public class StringUtil {
     }
 
     public static String toUnicodeString(String s) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c >= 0 && c <= 255) {
@@ -58,18 +62,15 @@ public class StringUtil {
                 case ' ':
                 case '/':
                 case '&':
-                    if (sb.length() > 0) {
-                        nextUpperCase = true;
-                    }
+                    nextUpperCase = sb.length() > 0;
                     break;
 
                 default:
                     if (nextUpperCase) {
-                        sb.append(Character.toUpperCase(c));
-                        nextUpperCase = false;
-                    } else {
-                        sb.append(Character.toLowerCase(c));
+                        c = Character.toUpperCase(c);
                     }
+                    nextUpperCase = false;
+                    sb.append(c);
                     break;
             }
         }

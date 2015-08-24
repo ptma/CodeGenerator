@@ -15,13 +15,16 @@
  */
 package org.joy.generator.engine;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class EngineBuilder {
+public class EngineBuilder implements Serializable {
 
-    private Map<String, TemplateEngine> engineMap;
+    private static final long serialVersionUID = 2299973831636720810L;
+
+    private transient Map<String, TemplateEngine> engineMap;
 
     public EngineBuilder(String classPath) {
         engineMap = new HashMap<String, TemplateEngine>();

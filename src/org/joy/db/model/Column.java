@@ -15,10 +15,12 @@
  */
 package org.joy.db.model;
 
+import java.io.Serializable;
+
 import org.joy.db.model.util.JavaTypeResolver;
 import org.joy.util.StringUtil;
 
-public class Column implements java.io.Serializable, Cloneable {
+public class Column implements Serializable {
 
     private static final long serialVersionUID = 241462432312500261L;
 
@@ -155,6 +157,18 @@ public class Column implements java.io.Serializable, Cloneable {
         return JavaTypeResolver.isInteger(javaType);
     }
 
+    public boolean isLong() {
+        return JavaTypeResolver.isLong(javaType);
+    }
+
+    public boolean isShort() {
+        return JavaTypeResolver.isShort(javaType);
+    }
+
+    public boolean isByte() {
+        return JavaTypeResolver.isByte(javaType);
+    }
+
     public boolean isBigDecimal() {
         return JavaTypeResolver.isBigDecimal(javaType);
     }
@@ -169,10 +183,13 @@ public class Column implements java.io.Serializable, Cloneable {
 
     public boolean isBLOB() {
         String typeName = getJdbcTypeName();
-
-        return "BINARY".equals(typeName) || "BLOB".equals(typeName) //$NON-NLS-1$ //$NON-NLS-2$
-               || "CLOB".equals(typeName) || "LONGVARBINARY".equals(typeName) //$NON-NLS-1$ //$NON-NLS-2$
-               || "LONGVARCHAR".equals(typeName) || "VARBINARY".equals(typeName); //$NON-NLS-1$ //$NON-NLS-2$
+        boolean isBlob = "BINARY".equals(typeName);
+        isBlob = isBlob || "BLOB".equals(typeName);
+        isBlob = isBlob || "CLOB".equals(typeName);
+        isBlob = isBlob || "LONGVARBINARY".equals(typeName);
+        isBlob = isBlob || "LONGVARCHAR".equals(typeName);
+        isBlob = isBlob || "VARBINARY".equals(typeName);
+        return isBlob;
     }
 
     public boolean isUnique() {
@@ -204,26 +221,32 @@ public class Column implements java.io.Serializable, Cloneable {
     }
 
     public String getGetterMethodName() {
-        if (JavaTypeResolver.isBoolean(javaType)) {
-            return "is" + getMethodName();
-        } else {
-            return "get" + getMethodName();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(javaProperty);
+        if (Character.isLowerCase(sb.charAt(0)) && (sb.length() == 1) && !Character.isUpperCase(sb.charAt(1))) {
+            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
         }
+
+        if (JavaTypeResolver.isBoolean(javaType)) {
+            sb.insert(0, "is");
+        } else {
+            sb.insert(0, "get");
+        }
+
+        return sb.toString();
     }
 
     public String getSetterMethodName() {
-        return "set" + getMethodName();
-    }
-
-    private String getMethodName() {
         StringBuilder sb = new StringBuilder();
+
         sb.append(javaProperty);
-        if (sb.length() > 1) {
-            char ch = sb.charAt(1);
-            if (Character.isLowerCase(ch)) {
-                sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
-            }
+        if (Character.isLowerCase(sb.charAt(0)) && (sb.length() == 1) && !Character.isUpperCase(sb.charAt(1))){
+            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
         }
+
+        sb.insert(0, "set");
+
         return sb.toString();
     }
 
@@ -259,11 +282,6 @@ public class Column implements java.io.Serializable, Cloneable {
         this.pkColumnName = pkColumnName;
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
     public boolean isAutoincrement() {
         return autoincrement;
     }
@@ -271,4 +289,5 @@ public class Column implements java.io.Serializable, Cloneable {
     public void setAutoincrement(boolean autoincrement) {
         this.autoincrement = autoincrement;
     }
+
 }

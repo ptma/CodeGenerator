@@ -15,20 +15,30 @@
  */
 package org.joy.config;
 
+import org.apache.log4j.Logger;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.joy.config.model.DriverInfo;
 import org.joy.util.StringUtil;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class JdbcDrivers {
+public class JdbcDrivers implements Serializable {
+
+    private static final long serialVersionUID = -7067509337564022948L;
+
+    private static final Logger            LOGGER = Logger.getLogger(JdbcDrivers.class);
 
     private static Map<String, DriverInfo> jdbcDriversMap;
 
@@ -60,51 +70,26 @@ public class JdbcDrivers {
             DocumentBuilder docBuilder = factory.newDocumentBuilder();
             Document doc = docBuilder.parse(JdbcDrivers.class.getResourceAsStream("jdbcDrivers.xml"));
 
-            Element rootNode = doc.getDocumentElement();
+            XPathFactory f = XPathFactory.newInstance();
+            XPath path = f.newXPath();
 
-            NodeList nodeList = rootNode.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node childNode = nodeList.item(i);
-
-                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                if ("driver".equals(childNode.getNodeName())) { //$NON-NLS-1$
-                    parseDriverNode(childNode);
+            NodeList driverList = (NodeList) path.evaluate("jdbcDrivers/driver", doc, XPathConstants.NODESET);
+            if (driverList != null) {
+                for (int i = 0; i < driverList.getLength(); i++) {
+                    parseDriverNode(driverList.item(i), path);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e);
         }
     }
 
-    private static void parseDriverNode(Node node) {
-        String jdbcDriver = null, jdbcUrl = null, name = null;
-        NodeList nodeList = node.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("driverClass".equals(childNode.getNodeName())) {
-                jdbcDriver = parseElementNodeValue(childNode);
-            } else if ("url".equals(childNode.getNodeName())) {
-                jdbcUrl = parseElementNodeValue(childNode);
-            } else if ("name".equals(childNode.getNodeName())) {
-                name = parseElementNodeValue(childNode);
-            }
-        }
+    private static void parseDriverNode(Node node, XPath path) throws XPathExpressionException {
+        String jdbcDriver = path.evaluate("./driverClass/text()", node);
+        String jdbcUrl = path.evaluate("./url/text()", node);
+        String name = path.evaluate("./name/text()", node);
         if (StringUtil.isNotEmpty(jdbcDriver) && StringUtil.isNotEmpty(jdbcUrl)) {
             JdbcDrivers.jdbcDriversMap.put(jdbcDriver, new DriverInfo(name, jdbcDriver, jdbcUrl));
-        }
-    }
-
-    private static String parseElementNodeValue(Node node) {
-        if (node.getFirstChild() != null) {
-            return node.getFirstChild().getNodeValue();
-        } else {
-            return null;
         }
     }
 

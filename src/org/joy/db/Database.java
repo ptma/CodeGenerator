@@ -15,6 +15,8 @@
  */
 package org.joy.db;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +26,8 @@ import org.joy.config.TypeMapping;
 import org.joy.db.model.Table;
 
 public abstract class Database {
+
+    private static final Logger LOGGER = Logger.getLogger(Database.class);
 
     protected Connection connection;
     protected TypeMapping typeMapping;
@@ -43,10 +47,9 @@ public abstract class Database {
         try {
             if (rs != null) {
                 rs.close();
-                rs = null;
             }
         } catch (SQLException e) {
-
+            LOGGER.info(e);
         }
     }
 
@@ -54,10 +57,9 @@ public abstract class Database {
         try {
             if (st != null) {
                 st.close();
-                st = null;
             }
         } catch (SQLException e) {
-
+            LOGGER.info(e);
         }
     }
 }

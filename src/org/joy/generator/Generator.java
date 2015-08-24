@@ -64,6 +64,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.apache.log4j.Logger;
 import org.joy.config.Configuration;
 import org.joy.config.TypeMapping;
 import org.joy.config.model.DatabaseElement;
@@ -71,6 +72,7 @@ import org.joy.db.Database;
 import org.joy.db.DatabaseFactory;
 import org.joy.db.model.Column;
 import org.joy.db.model.Table;
+import org.joy.exception.ApplicationException;
 import org.joy.generator.ui.TreeNodeData;
 import org.joy.generator.ui.component.ComboBoxEditor;
 import org.joy.generator.ui.component.EditableTable;
@@ -82,6 +84,8 @@ import org.joy.util.StringUtil;
 
 public class Generator extends JFrame {
 
+    private static final Logger    LOGGER              = Logger.getLogger(Generator.class);
+
     private static final long      serialVersionUID    = -7813705897974255551L;
 
     private static Font            font                = new Font("宋体", Font.PLAIN, 12);
@@ -89,7 +93,7 @@ public class Generator extends JFrame {
                         "默认值", "注释"                   };
     public static final int        IDX_COLUMN_JAVATYPE = 2;
     public static final int        IDX_COLUMN_NULLABLE = 8;
-    public static final int        IDX_COLUMN_REMARK = 10;
+    public static final int        IDX_COLUMN_REMARK   = 10;
 
     private JPanel                 contentPane;
     private JSplitPane             contentSplitPane;
@@ -120,41 +124,9 @@ public class Generator extends JFrame {
     private TypeMapping            typeMapping;
     private DbManagementDialog     dbManagementDialog;
     private DatabaseElement        databaseElement;
-    private Connection             connection;
+    private transient Connection   connection;
     private Table                  tableModel;
     private String                 classPath;
-
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-                    Generator frame = new Generator();
-                    frame.setVisible(true);
-                    frame.centerScreen();
-                    frame.contentSplitPane.setDividerLocation(0.25);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    private static void InitGlobalFont(Font font) {
-        FontUIResource fontRes = new FontUIResource(font);
-        for (Enumeration<Object> keys = UIManager.getDefaults().keys(); keys.hasMoreElements();) {
-            Object key = keys.nextElement();
-            Object value = UIManager.get(key);
-            if (value instanceof FontUIResource) {
-                UIManager.put(key, fontRes);
-            }
-        }
-    }
 
     /**
      * Create the frame.
@@ -162,7 +134,6 @@ public class Generator extends JFrame {
     public Generator(){
         setTitle("CodeGenerator");
         addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowClosing(WindowEvent e) {
                 shutdown();
@@ -180,16 +151,18 @@ public class Generator extends JFrame {
         JMenuItem menuItemExit = new JMenuItem("Exit");
         menuItemExit.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                onExitActionPerformed(e);
+                onExitActionPerformed();
             }
         });
 
         mntmConnect = new JMenuItem("Connect...");
         mntmConnect.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                onConnectActionPerformed(e);
+                onConnectActionPerformed();
             }
         });
         mnNewMenu.add(mntmConnect);
@@ -197,6 +170,7 @@ public class Generator extends JFrame {
         mntmDisconnect = new JMenuItem("DisConnect");
         mntmDisconnect.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 disConnection();
             }
@@ -238,6 +212,7 @@ public class Generator extends JFrame {
                 onTablesTreeMouseReleased(e);
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 onTablesTreeMousePressed(e);
             }
@@ -246,26 +221,7 @@ public class Generator extends JFrame {
         tablesTree.setRootVisible(false);
         tablesTree.setShowsRootHandles(true);
         leftScrollPane.setViewportView(tablesTree);
-        tablesTree.setCellRenderer(new DefaultTreeCellRenderer() {
-
-            private static final long serialVersionUID = 1033798115180836224L;
-
-            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
-                                                          boolean leaf,
-
-                                                          int row, boolean hasFocus) {
-
-                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-
-                if (value instanceof DefaultMutableTreeNode) {
-                    Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
-                    setIcon(((TreeNodeData) userObject).getIcon());
-                } else {
-                    setIcon(createImageIcon("./icon/folder.png"));
-                }
-                return this;
-            }
-        });
+        tablesTree.setCellRenderer(new GridCellRenderer());
 
         tablesTreePopupMenu = new JPopupMenu();
 
@@ -273,6 +229,7 @@ public class Generator extends JFrame {
         tablesTreePopupMenu.add(mntmTableInfo);
         mntmTableInfo.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 loadDatabaseTable();
             }
@@ -312,8 +269,9 @@ public class Generator extends JFrame {
         btnGenerate = new JButton("生成...");
         btnGenerate.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                onGenerateActionPerformed(e);
+                onGenerateActionPerformed();
             }
         });
         btnGenerate.setEnabled(false);
@@ -321,19 +279,25 @@ public class Generator extends JFrame {
 
         mntmConnect.setEnabled(true);
         mntmDisconnect.setEnabled(false);
-        InitGlobalFont(font);
+        initGlobalFont(font);
+        initSettings();
+    }
+
+    private void initSettings() {
         File f = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
         classPath = f.getParentFile().getPath() + File.separator;
+        classPath = classPath.replaceAll("%20", " ");
 
         configuration = new Configuration(classPath);
         try {
             configuration.loadConfiguration();
-            if (configuration.getClassPathEntries().size() > 0) {
+            if (!configuration.getClassPathEntries().isEmpty()) {
                 ClassLoader classLoader = ClassloaderUtility.getCustomClassloader(classPath,
                                                                                   configuration.getClassPathEntries());
                 ObjectFactory.addExternalClassLoader(classLoader);
             }
         } catch (Exception e) {
+            LOGGER.info(e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -341,10 +305,22 @@ public class Generator extends JFrame {
         try {
             typeMapping.loadMappgin();
         } catch (Exception e) {
+            LOGGER.info(e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
 
         drawTableGrid();
+    }
+
+    private static void initGlobalFont(Font font) {
+        FontUIResource fontRes = new FontUIResource(font);
+        for (Enumeration<Object> keys = UIManager.getDefaults().keys(); keys.hasMoreElements();) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value instanceof FontUIResource) {
+                UIManager.put(key, fontRes);
+            }
+        }
     }
 
     private void loadTableTree(String schema) {
@@ -377,6 +353,7 @@ public class Generator extends JFrame {
             tablesTreeModel.reload();
             rs.close();
         } catch (SQLException e) {
+            LOGGER.info(e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -386,7 +363,7 @@ public class Generator extends JFrame {
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
-            System.err.println("Couldn't find file: " + path);
+            LOGGER.error("Couldn't find file: " + path);
             return null;
         }
     }
@@ -398,34 +375,10 @@ public class Generator extends JFrame {
     }
 
     public void disConnection() {
-
         CloseConnectionTask cct = new CloseConnectionTask(connection);
-        cct.addTaskListener(new TaskListener() {
-
-            public void taskFinished() {
-                mntmConnect.setEnabled(true);
-                mntmDisconnect.setEnabled(false);
-                tablesNode.removeAllChildren();
-                viewsNode.removeAllChildren();
-                tablesTreeModel.reload();
-                tableModel = null;
-                tableGridModel.setRowCount(0);
-                btnGenerate.setEnabled(false);
-            }
-
-            public void taskStatus(Object obj) {
-
-            }
-
-            public void taskResult(Object obj) {
-
-            }
-
-            public void taskError(Exception e) {
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        cct.start();
+        cct.addTaskListener(new MyTaskListener());
+        Thread connThread = new Thread(cct);
+        connThread.start();
     }
 
     private void shutdown() {
@@ -433,7 +386,7 @@ public class Generator extends JFrame {
         dispose();
     }
 
-    private void onConnectActionPerformed(java.awt.event.ActionEvent evt) {
+    private void onConnectActionPerformed() {
         if (dbManagementDialog == null) {
             dbManagementDialog = new DbManagementDialog(configuration);
         }
@@ -448,15 +401,14 @@ public class Generator extends JFrame {
                     mntmDisconnect.setEnabled(true);
                     loadTableTree(databaseElement.getSchema());
                 }
-            } catch (ClassNotFoundException cfe) {
-                JOptionPane.showMessageDialog(this, "找不到你选择的 JDBC Driver 类.", "错误", JOptionPane.ERROR_MESSAGE);
-            } catch (SQLException e) {
+            } catch (ApplicationException e) {
+                LOGGER.info(e);
                 JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
-    private void onExitActionPerformed(java.awt.event.ActionEvent evt) {
+    private void onExitActionPerformed() {
         this.shutdown();
     }
 
@@ -518,41 +470,21 @@ public class Generator extends JFrame {
     }
 
     private void drawTableGrid() {
-
         Object[][] cellData = new Object[0][headers.length];
         tableGridModel = new DefaultTableModel(cellData, headers) {
 
             private static final long serialVersionUID = 880033063879582590L;
 
+            @Override
             public boolean isCellEditable(int row, int column) {
-                if (column == IDX_COLUMN_JAVATYPE || column == IDX_COLUMN_NULLABLE || column == IDX_COLUMN_REMARK) {
-                    return true;
-                } else return false;
+                return column == IDX_COLUMN_JAVATYPE || column == IDX_COLUMN_NULLABLE || column == IDX_COLUMN_REMARK;
             }
         };
-        tableGridModel.addTableModelListener(new TableModelListener() {
-
-            public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.UPDATE && e.getLastRow() >= 0) {
-                    String columnName = tableGrid.getValueAt(e.getLastRow(), 0).toString();
-                    String value = tableGrid.getValueAt(e.getLastRow(), e.getColumn()).toString();
-                    Column column = tableModel.getColumn(columnName);
-                    if (column != null) {
-                        if (e.getColumn() == IDX_COLUMN_JAVATYPE) {
-                            column.setJavaType(value);
-                        } else if (e.getColumn() == IDX_COLUMN_NULLABLE) {
-                            column.setNullable(Boolean.parseBoolean(value));
-                        } else if (e.getColumn() == IDX_COLUMN_REMARK) {
-                            column.setRemarks(value);
-                        }
-                    }
-                }
-            }
-        });
+        tableGridModel.addTableModelListener(new MyTableModelListener());
         tableGrid.setModel(tableGridModel);
         tableGrid.setRowHeight(22);
 
-        ((EditableTable) tableGrid).setComboCell(IDX_COLUMN_JAVATYPE, new ComboBoxEditor(typeMapping.getAllJavaTypes()));// 第2列为下拉
+        tableGrid.setComboCell(IDX_COLUMN_JAVATYPE, new ComboBoxEditor(typeMapping.getAllJavaTypes()));// 第2列为下拉
 
         resizeTableGrid(true);
     }
@@ -613,13 +545,107 @@ public class Generator extends JFrame {
             resizeTableGrid(true);
             btnGenerate.setEnabled(true);
         } catch (Exception e) {
+            LOGGER.info(e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void onGenerateActionPerformed(java.awt.event.ActionEvent evt) {
+    private void onGenerateActionPerformed() {
         GenerationDialog generationDialog = new GenerationDialog(configuration, tableModel, classPath);
         generationDialog.setVisible(true);
     }
 
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+                    Generator frame = new Generator();
+                    frame.setVisible(true);
+                    frame.centerScreen();
+                    frame.contentSplitPane.setDividerLocation(0.25);
+
+                } catch (Exception e) {
+                    LOGGER.info(e);
+                }
+            }
+        });
+    }
+
+    class GridCellRenderer extends DefaultTreeCellRenderer {
+
+        private static final long serialVersionUID = -7722773267229736081L;
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
+                                                      boolean leaf, int row, boolean hasFocus) {
+
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+
+            if (value instanceof DefaultMutableTreeNode) {
+                Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
+                setIcon(((TreeNodeData) userObject).getIcon());
+            } else {
+                setIcon(createImageIcon("./icon/folder.png"));
+            }
+            return this;
+        }
+    }
+
+    class MyTaskListener implements TaskListener {
+
+        @Override
+        public void taskFinished() {
+            mntmConnect.setEnabled(true);
+            mntmDisconnect.setEnabled(false);
+            tablesNode.removeAllChildren();
+            viewsNode.removeAllChildren();
+            tablesTreeModel.reload();
+            tableModel = null;
+            tableGridModel.setRowCount(0);
+            btnGenerate.setEnabled(false);
+        }
+
+        @Override
+        public void taskStatus(Object obj) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void taskResult(Object obj) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void taskError(Exception e) {
+            LOGGER.info(e);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    class MyTableModelListener implements TableModelListener {
+
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            if (e.getType() == TableModelEvent.UPDATE && e.getLastRow() >= 0) {
+                String columnName = tableGrid.getValueAt(e.getLastRow(), 0).toString();
+                String value = tableGrid.getValueAt(e.getLastRow(), e.getColumn()).toString();
+                Column column = tableModel.getColumn(columnName);
+                if (column != null) {
+                    if (e.getColumn() == IDX_COLUMN_JAVATYPE) {
+                        column.setJavaType(value);
+                    } else if (e.getColumn() == IDX_COLUMN_NULLABLE) {
+                        column.setNullable(Boolean.parseBoolean(value));
+                    } else if (e.getColumn() == IDX_COLUMN_REMARK) {
+                        column.setRemarks(value);
+                    }
+                }
+            }
+        }
+    }
 }

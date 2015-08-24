@@ -16,6 +16,7 @@
 package org.joy.db;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -27,6 +28,8 @@ import org.joy.util.StringUtil;
 
 public class DefaultDatabase extends Database {
 
+    private static final String COLUMN_NAME = "COLUMN_NAME";
+
     public DefaultDatabase(Connection connection, TypeMapping typeMapping){
         super(connection, typeMapping);
     }
@@ -37,11 +40,10 @@ public class DefaultDatabase extends Database {
         Table table = null;
         String schemaPattern = null;
         try {
-            if(StringUtil.isNotEmpty(schema)){
+            if (StringUtil.isNotEmpty(schema)) {
                 schemaPattern = schema;
             }
-            rs = connection.getMetaData().getTables(catalog, schemaPattern, tableName,
-                                                    new String[] { "TABLE", "VIEW"});
+            rs = connection.getMetaData().getTables(catalog, schemaPattern, tableName, new String[] { "TABLE", "VIEW" });
             if (rs.next()) {
                 table = new Table();
                 table.setCatalog(rs.getString("TABLE_CAT"));
@@ -68,7 +70,7 @@ public class DefaultDatabase extends Database {
         try {
             rs = connection.getMetaData().getPrimaryKeys(null, table.getSchema(), table.getTableName());
             while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");
+                String columnName = rs.getString(COLUMN_NAME);
                 Column column = table.getColumn(columnName);
                 if (column == null) {
                     column = new Column(columnName);
@@ -88,7 +90,7 @@ public class DefaultDatabase extends Database {
         try {
             rs = connection.getMetaData().getColumns(null, table.getSchema(), table.getTableName(), "%");
             while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");// 获得字段名称
+                String columnName = rs.getString(COLUMN_NAME);
                 if (StringUtil.isEmpty(columnName)) {
                     continue;
                 }
@@ -151,7 +153,7 @@ public class DefaultDatabase extends Database {
         try {
             rs = connection.getMetaData().getIndexInfo(null, table.getSchema(), table.getTableName(), true, true);
             while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");
+                String columnName = rs.getString(COLUMN_NAME);
                 if (StringUtil.isEmpty(columnName)) {
                     continue;
                 }
@@ -164,6 +166,64 @@ public class DefaultDatabase extends Database {
             throw e;
         } finally {
             close(rs);
+        }
+    }
+
+    /**
+     * 查询表注释
+     *
+     * @param table
+     * @param commentSql 查询表注释的SQL, 含一个占位符 (tableName)
+     * @param columnComments 注释列列名
+     * @throws SQLException
+     */
+    protected void introspectTableComments(Table table, String commentSql, String columnComments) throws SQLException {
+        PreparedStatement psmt = null;
+        ResultSet rs = null;
+        try {
+            psmt = connection.prepareStatement(commentSql);
+            psmt.setString(1, table.getTableName());
+            rs = psmt.executeQuery();
+            if (rs.next()) {
+                table.setRemarks(rs.getString(columnComments));
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(rs);
+            close(psmt);
+        }
+    }
+
+    /**
+     * 查询表中列注释
+     *
+     * @param table
+     * @param colCommentSql 查询表中列注释的SQL, 含一个占位符 (tableName)
+     * @param columnColumnName 字段名列列名
+     * @param columnComments 注释列列名
+     * @throws SQLException
+     */
+    protected void introspectTableColumnsComments(Table table, String colCommentSql, String columnColumnName,
+                                                  String columnComments) throws SQLException {
+        PreparedStatement psmt = null;
+        ResultSet rs = null;
+        try {
+            psmt = connection.prepareStatement(colCommentSql);
+            psmt.setString(1, table.getTableName());
+            rs = psmt.executeQuery();
+            while (rs.next()) {
+                String columnName = rs.getString(columnColumnName);
+                Column column = table.getColumn(columnName);
+                if (column != null) {
+                    column.setRemarks(rs.getString(columnComments));
+                }
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(rs);
+            close(psmt);
         }
     }
 }

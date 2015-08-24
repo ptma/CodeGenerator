@@ -1,7 +1,6 @@
 package org.joy.util.messgae;
 
 import java.text.MessageFormat;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Messages {
@@ -14,34 +13,18 @@ public class Messages {
     }
 
     public static String getString(String key) {
-        try {
-            return RESOURCE_BUNDLE.getString(key);
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+        return RESOURCE_BUNDLE.getString(key);
     }
 
     public static String getString(String key, String parm1) {
-        try {
-            return MessageFormat.format(RESOURCE_BUNDLE.getString(key), new Object[] { parm1 });
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+        return MessageFormat.format(RESOURCE_BUNDLE.getString(key), new Object[] { parm1 });
     }
 
     public static String getString(String key, String parm1, String parm2) {
-        try {
-            return MessageFormat.format(RESOURCE_BUNDLE.getString(key), new Object[] { parm1, parm2 });
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+        return MessageFormat.format(RESOURCE_BUNDLE.getString(key), new Object[] { parm1, parm2 });
     }
 
     public static String getString(String key, String parm1, String parm2, String parm3) {
-        try {
-            return MessageFormat.format(RESOURCE_BUNDLE.getString(key), new Object[] { parm1, parm2, parm3 });
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+        return MessageFormat.format(RESOURCE_BUNDLE.getString(key), new Object[] { parm1, parm2, parm3 });
     }
 }

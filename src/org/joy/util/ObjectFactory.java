@@ -3,9 +3,13 @@ package org.joy.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.joy.exception.AppRuntimeException;
 import org.joy.util.messgae.Messages;
 
 public class ObjectFactory {
+
+    private static final Logger      LOGGER = Logger.getLogger(ObjectFactory.class);
 
     private static List<ClassLoader> externalClassLoaders;
 
@@ -30,8 +34,8 @@ public class ObjectFactory {
                 classLoader.loadClass(type);
                 clazz = Class.forName(type, true, classLoader);
                 return clazz;
-            } catch (Throwable e) {
-                // Ignore
+            } catch (ClassNotFoundException e) {
+                LOGGER.info(e);
             }
         }
 
@@ -44,8 +48,8 @@ public class ObjectFactory {
         try {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             clazz = Class.forName(type, true, cl);
-        } catch (Exception e) {
-            // ignore - failsafe below
+        } catch (ClassNotFoundException e) {
+            LOGGER.info(e);
         }
 
         if (clazz == null) {
@@ -62,7 +66,7 @@ public class ObjectFactory {
             Class<?> clazz = externalClassForName(type);
             answer = clazz.newInstance();
         } catch (Exception e) {
-            throw new RuntimeException(Messages.getString("RuntimeError.5", type), e); //$NON-NLS-1$
+            throw new AppRuntimeException(Messages.getString("RuntimeError.5", type), e); //$NON-NLS-1$
         }
 
         return answer;

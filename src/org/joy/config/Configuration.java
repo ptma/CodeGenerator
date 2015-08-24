@@ -16,7 +16,7 @@
 package org.joy.config;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,33 +24,41 @@ import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
+import org.apache.log4j.Logger;
 import org.joy.config.model.DatabaseElement;
 import org.joy.config.model.TemplateElement;
+import org.joy.exception.ApplicationException;
 import org.joy.util.StringUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-public class Configuration {
+public class Configuration implements Serializable {
+
+    private static final long serialVersionUID = -6808310529559677534L;
+
+    private static final Logger   LOGGER             = Logger.getLogger(Configuration.class);
 
     private static final String   CONFIGURATION_FILE = "configuration.xml";
     private String                configurationFile;
-    private List<DatabaseElement> connectionHistory;
-    private List<String>          classPathEntries;
+    private ArrayList<DatabaseElement> connectionHistory;
+    private ArrayList<String>          classPathEntries;
     private String                tagertProject;
     private String                basePackage;
     private String                moduleName;
-    private List<TemplateElement> templates;
+    private ArrayList<TemplateElement> templates;
 
     public Configuration(String classPath){
         this.configurationFile = classPath + CONFIGURATION_FILE;
@@ -59,48 +67,32 @@ public class Configuration {
         templates = new ArrayList<TemplateElement>();
     }
 
-    public void loadConfiguration() throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = factory.newDocumentBuilder();
-        Document doc = docBuilder.parse(configurationFile);
-        // Get the root element <configuration>
-        Element rootNode = doc.getDocumentElement();
+    public void loadConfiguration() throws ApplicationException {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = factory.newDocumentBuilder();
+            Document doc = docBuilder.parse(configurationFile);
 
-        NodeList nodeList = rootNode.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
+            XPathFactory f = XPathFactory.newInstance();
+            XPath path = f.newXPath();
 
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
+            parseClassPathEntry(doc, path);
+            parseConnections(doc, path);
+            parseTemplates(doc, path);
 
-            if ("classpath".equals(childNode.getNodeName())) { //$NON-NLS-1$
-                parseClassPathEntry(childNode);
-            } else if ("connections".equals(childNode.getNodeName())) { //$NON-NLS-1$
-                parseConnections(childNode);
-            } else if ("tagertProject".equals(childNode.getNodeName())) { //$NON-NLS-1$
-                tagertProject = parseElementNodeValue(childNode);
-            } else if ("basePackage".equals(childNode.getNodeName())) { //$NON-NLS-1$
-                basePackage = parseElementNodeValue(childNode);
-            } else if ("moduleName".equals(childNode.getNodeName())) { //$NON-NLS-1$
-                moduleName = parseElementNodeValue(childNode);
-            } else if ("templates".equals(childNode.getNodeName())) { //$NON-NLS-1$
-                parseTemplates(childNode);
-            }
+            tagertProject = path.evaluate("/configuration/tagertProject/text()", doc);
+            basePackage = path.evaluate("/configuration/basePackage/text()", doc);
+            moduleName = path.evaluate("/configuration/moduleName/text()", doc);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
         }
-
     }
 
-    private void parseClassPathEntry(Node node) {
-        NodeList nodeList = node.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
-
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("entry".equals(childNode.getNodeName())) {
-                String entry = parseElementNodeValue(childNode);
+    private void parseClassPathEntry(Document doc, XPath path) throws XPathExpressionException {
+        NodeList classpathEntrys = (NodeList) path.evaluate("configuration/classpath/entry", doc, XPathConstants.NODESET);
+        if (classpathEntrys != null) {
+            for (int i = 0; i < classpathEntrys.getLength(); i++) {
+                String entry = parseElementNodeValue(classpathEntrys.item(i));
                 if (StringUtil.isNotEmpty(entry)) {
                     classPathEntries.add(entry);
                 }
@@ -108,91 +100,59 @@ public class Configuration {
         }
     }
 
-    private void parseConnections(Node node) {
-        NodeList nodeList = node.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
-
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("database".equals(childNode.getNodeName())) {
-                parseDatabase(childNode);
+    private void parseConnections(Document doc, XPath path) throws XPathExpressionException {
+        NodeList databaseList = (NodeList) path.evaluate("configuration/connections/database", doc, XPathConstants.NODESET);
+        if (databaseList != null) {
+            for (int i = 0; i < databaseList.getLength(); i++) {
+                parseDatabase(databaseList.item(i), path);
             }
         }
     }
 
-    private void parseDatabase(Node node) {
-        NodeList nodeList = node.getChildNodes();
-        String name = null, driverClass = null, url = null, username = null, password = null, schema = null;
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
+    private void parseDatabase(Node node, XPath path) throws XPathExpressionException {
+        String name = path.evaluate("@name", node);
+        String driverClass = path.evaluate("./driverClass/text()", node);
+        String url = path.evaluate("./url/text()", node);
+        String username = path.evaluate("./username/text()", node);
+        String password = path.evaluate("./password/text()", node);
+        String schema = path.evaluate("./schema/text()", node);
 
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("driverClass".equals(childNode.getNodeName())) {
-                driverClass = parseElementNodeValue(childNode);
-            } else if ("url".equals(childNode.getNodeName())) {
-                url = parseElementNodeValue(childNode);
-            } else if ("username".equals(childNode.getNodeName())) {
-                username = parseElementNodeValue(childNode);
-            } else if ("password".equals(childNode.getNodeName())) {
-                password = parseElementNodeValue(childNode);
-            } else if ("schema".equals(childNode.getNodeName())) {
-                schema = parseElementNodeValue(childNode);
-            }
-        }
-
-        name = parseAttributes(node).getProperty("name");
         if (StringUtil.isNotEmpty(name) && StringUtil.isNotEmpty(driverClass) && StringUtil.isNotEmpty(url)
             && StringUtil.isNotEmpty(username)) {
             connectionHistory.add(new DatabaseElement(name, driverClass, url, username, password, schema));
         }
     }
 
-    private void parseTemplates(Node node) {
-        NodeList nodeList = node.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
-
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("template".equals(childNode.getNodeName())) {
-                parseTemplate(childNode);
+    private void parseTemplates(Document doc, XPath path) throws XPathExpressionException {
+        NodeList templateList = (NodeList) path.evaluate("configuration/templates/template", doc, XPathConstants.NODESET);
+        if (templateList != null) {
+            for (int i = 0; i < templateList.getLength(); i++) {
+                parseTemplate(templateList.item(i), path);
             }
         }
     }
 
-    private void parseTemplate(Node node) {
-        NodeList nodeList = node.getChildNodes();
+    private void parseTemplate(Node node, XPath path) throws XPathExpressionException {
         String name = null, engine = null, templateFile = null, targetPath = null, targetFileName = null, encoding = null;
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
+        templateFile = path.evaluate("./templateFile/text()", node);
+        targetPath = path.evaluate("./targetPath/text()", node);
+        targetFileName = path.evaluate("./targetFileName/text()", node);
+        encoding = path.evaluate("./encoding/text()", node);
 
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            if ("templateFile".equals(childNode.getNodeName())) {
-                templateFile = parseElementNodeValue(childNode);
-            } else if ("targetPath".equals(childNode.getNodeName())) {
-                targetPath = parseElementNodeValue(childNode);
-            } else if ("targetFileName".equals(childNode.getNodeName())) {
-                targetFileName = parseElementNodeValue(childNode);
-            } else if ("encoding".equals(childNode.getNodeName())) {
-                encoding = parseElementNodeValue(childNode);
-            }
+        name = path.evaluate("@name", node);
+        engine = path.evaluate("@engine", node);
+
+        if (StringUtil.isEmpty(engine)) {
+            engine = "freemarker";
         }
-
-        Properties attrs = parseAttributes(node);
-        name = attrs.getProperty("name");
-        engine = attrs.getProperty("engine");
-        if (StringUtil.isNotEmpty(name) && StringUtil.isNotEmpty(engine) && StringUtil.isNotEmpty(templateFile)
-            && StringUtil.isNotEmpty(targetPath) && StringUtil.isNotEmpty(targetFileName)
-            && StringUtil.isNotEmpty(encoding)) {
-            TemplateElement templateElement = new TemplateElement(name, engine, templateFile, targetPath,
-                                                                  targetFileName, encoding);
+        if (StringUtil.isEmpty(encoding)) {
+            encoding = "UTF-8";
+        }
+        if (StringUtil.isEmpty(name)) {
+            name = templateFile;
+        }
+        if (StringUtil.isNotEmpty(templateFile) && StringUtil.isNotEmpty(targetPath) && StringUtil.isNotEmpty(targetFileName)) {
+            TemplateElement templateElement = new TemplateElement(name, engine, templateFile, targetPath, targetFileName, encoding);
             templates.add(templateElement);
             templateElement.setSelected(Boolean.parseBoolean(parseAttributes(node).getProperty("selected")));
         }
@@ -308,7 +268,7 @@ public class Configuration {
             t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             t.transform(ds, sr);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e);
         }
     }
 

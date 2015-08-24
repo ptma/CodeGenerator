@@ -15,35 +15,35 @@
  */
 package org.joy.config;
 
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.joy.db.model.Column;
 import org.joy.db.model.util.JavaTypeResolver;
 import org.joy.db.model.util.JdbcTypeResolver;
+import org.joy.exception.ApplicationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-public class TypeMapping {
+public class TypeMapping implements Serializable {
+
+    private static final long serialVersionUID = 8573950623347746321L;
 
     private static final String  MAPING_FILE = "TypeMapping.xml";
 
     private String               mappginFile;
 
-    private Map<Integer, String> typeMap;
-    private Map<Integer, String> fullTypeMap;
+    private HashMap<Integer, String> typeMap;
+    private HashMap<Integer, String> fullTypeMap;
 
     public TypeMapping(String classPath){
         this.mappginFile = classPath + MAPING_FILE;
@@ -51,26 +51,30 @@ public class TypeMapping {
         fullTypeMap = new HashMap<Integer, String>();
     }
 
-    public void loadMappgin() throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = factory.newDocumentBuilder();
-        Document doc = docBuilder.parse(mappginFile);
-        Element rootNode = doc.getDocumentElement();
+    public void loadMappgin() throws ApplicationException {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = factory.newDocumentBuilder();
+            Document doc = docBuilder.parse(mappginFile);
+            Element rootNode = doc.getDocumentElement();
 
-        NodeList nodeList = rootNode.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
+            NodeList nodeList = rootNode.getChildNodes();
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node childNode = nodeList.item(i);
 
-            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
+                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+
+                if ("map".equals(childNode.getNodeName())) { //$NON-NLS-1$
+                    Properties attrs = parseAttributes(childNode);
+                    int sqlType = JdbcTypeResolver.getJdbcType(attrs.getProperty("sqlType"));
+                    typeMap.put(sqlType, attrs.getProperty("javaType"));
+                    fullTypeMap.put(sqlType, attrs.getProperty("fullJavaType"));
+                }
             }
-
-            if ("map".equals(childNode.getNodeName())) { //$NON-NLS-1$
-                Properties attrs = parseAttributes(childNode);
-                int sqlType = JdbcTypeResolver.getJdbcType(attrs.getProperty("sqlType"));
-                typeMap.put(sqlType, attrs.getProperty("javaType"));
-                fullTypeMap.put(sqlType, attrs.getProperty("fullJavaType"));
-            }
+        } catch (Exception e) {
+            throw new ApplicationException(e);
         }
     }
 

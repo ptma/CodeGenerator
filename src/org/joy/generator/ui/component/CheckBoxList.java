@@ -59,6 +59,7 @@ public class CheckBoxList extends JList {
 
         private static final long serialVersionUID = -8835050180063363917L;
 
+        @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
                                                       boolean cellHasFocus) {
 
@@ -72,14 +73,17 @@ public class CheckBoxList extends JList {
 
     class CheckBoxListUI extends BasicListUI implements MouseInputListener {
 
+        @Override
         protected MouseInputListener createMouseInputListener() {
             return this;
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             CheckBoxList.this.requestFocus();
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             int row = CheckBoxList.this.locationToIndex(e.getPoint());
 
@@ -93,24 +97,29 @@ public class CheckBoxList extends JList {
             CheckBoxList.this.requestFocus();
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
-
+            throw new UnsupportedOperationException();
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
-
+            throw new UnsupportedOperationException();
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
-
+            throw new UnsupportedOperationException();
         }
 
+        @Override
         public void mouseDragged(MouseEvent e) {
-
+            throw new UnsupportedOperationException();
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {
-
+            throw new UnsupportedOperationException();
         }
 
     }

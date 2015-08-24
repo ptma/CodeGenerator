@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.joy.util.StringUtil;
 
-public class Table implements java.io.Serializable, Cloneable {
+public class Table implements java.io.Serializable {
 
     private static final long serialVersionUID  = -7246043091254837124L;
     private String            tableName;
@@ -187,8 +187,4 @@ public class Table implements java.io.Serializable, Cloneable {
         return false;
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
 }

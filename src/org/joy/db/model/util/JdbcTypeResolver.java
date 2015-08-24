@@ -23,6 +23,7 @@ public class JdbcTypeResolver {
 
     private static Map<Integer, String> typeToName;
     private static Map<String, Integer> nameToType;
+    private static final String         OTHER = "OTHER";
 
     static {
         typeToName = new HashMap<Integer, String>();
@@ -50,7 +51,7 @@ public class JdbcTypeResolver {
         typeToName.put(Jdbc4Types.LONGNVARCHAR, "LONGNVARCHAR");
         typeToName.put(Types.NULL, "NULL");
         typeToName.put(Types.NUMERIC, "NUMERIC");
-        typeToName.put(Types.OTHER, "OTHER");
+        typeToName.put(Types.OTHER, OTHER);
         typeToName.put(Types.REAL, "REAL");
         typeToName.put(Types.REF, "REF");
         typeToName.put(Types.SMALLINT, "SMALLINT");
@@ -86,7 +87,7 @@ public class JdbcTypeResolver {
         nameToType.put("LONGNVARCHAR", Jdbc4Types.LONGNVARCHAR);
         nameToType.put("NULL", Types.NULL);
         nameToType.put("NUMERIC", Types.NUMERIC);
-        nameToType.put("OTHER", Types.OTHER);
+        nameToType.put(OTHER, Types.OTHER);
         nameToType.put("REAL", Types.REAL);
         nameToType.put("REF", Types.REF);
         nameToType.put("SMALLINT", Types.SMALLINT);
@@ -105,7 +106,7 @@ public class JdbcTypeResolver {
     public static String getJdbcTypeName(int jdbcType) {
         String answer = typeToName.get(jdbcType);
         if (answer == null) {
-            answer = "OTHER";
+            answer = OTHER;
         }
 
         return answer;

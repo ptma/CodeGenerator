@@ -15,6 +15,8 @@
  */
 package org.joy.generator;
 
+import org.apache.log4j.Logger;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -46,6 +48,8 @@ import org.joy.util.StringUtil;
 
 public class GenerationDialog extends JDialog {
 
+    private static final Logger LOGGER           = Logger.getLogger(GenerationDialog.class);
+
     private static final long serialVersionUID = 6159091936841897188L;
 
     private final JPanel      contentPanel     = new JPanel();
@@ -66,7 +70,6 @@ public class GenerationDialog extends JDialog {
     public GenerationDialog(Configuration configuration, Table tableModel, String classPath){
 
         setModal(true);
-        // setModalityType(ModalityType.APPLICATION_MODAL);
         setTitle("生成代码");
         setResizable(false);
         setBounds(100, 100, 419, 485);
@@ -150,8 +153,9 @@ public class GenerationDialog extends JDialog {
         buttonPane.add(btnOK);
         btnOK.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
-                okButtonClick(e);
+                okButtonClick();
             }
         });
         btnOK.setMnemonic(KeyEvent.VK_ENTER);
@@ -162,6 +166,7 @@ public class GenerationDialog extends JDialog {
         buttonPane.add(btnCancel);
         btnCancel.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }
@@ -209,7 +214,7 @@ public class GenerationDialog extends JDialog {
         dispose();
     }
 
-    private void okButtonClick(ActionEvent evt) {
+    private void okButtonClick() {
         Object[] selectedValues = templatesList.getSelectedValues();
         if (selectedValues.length==0) {
             JOptionPane.showMessageDialog(this, "请选择模板.", "提示", JOptionPane.INFORMATION_MESSAGE);
@@ -236,6 +241,10 @@ public class GenerationDialog extends JDialog {
             return;
         }
 
+        processSelectedTemplates(selectedValues, targetProject, basePackage, moduleName, tableAlias);
+    }
+
+    private void processSelectedTemplates(Object[] selectedTemplateElements, String targetProject, String basePackage, String moduleName, String tableAlias){
         configuration.setTagertProject(targetProject);
         configuration.setBasePackage(basePackage);
         configuration.setModuleName(moduleName);
@@ -253,11 +262,10 @@ public class GenerationDialog extends JDialog {
         }
 
 
-        int count = selectedValues.length;
+        int count = selectedTemplateElements.length;
         for (int i=0;i<count; i++) {
             try {
-                Object selectedObject = selectedValues[i];
-                TemplateElement templateElement = (TemplateElement) selectedObject;
+                TemplateElement templateElement = (TemplateElement) selectedTemplateElements[i];
                 templateElement.setSelected(true);
 
                 TemplateEngine templateEngine = engineBuilder.getTemplateEngine(templateElement.getEngine());
@@ -267,6 +275,7 @@ public class GenerationDialog extends JDialog {
                     templateEngine.processToFile(model, templateElement);
                 }
             } catch (Exception e) {
+                LOGGER.info(e);
                 JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
             }
         }

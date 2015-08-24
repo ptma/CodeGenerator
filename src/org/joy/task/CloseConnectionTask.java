@@ -25,6 +25,7 @@ public class CloseConnectionTask extends Task {
         this.connection = connection;
     }
 
+    @Override
     public void run() {
         try {
             if (connection != null) {
