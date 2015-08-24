@@ -13,13 +13,13 @@ public abstract class Task implements Runnable {
     private List<TaskListener> listeners = new ArrayList<TaskListener>();
 
     public synchronized void addTaskListener(TaskListener listener) {
-        ArrayList<TaskListener> newListeners = new ArrayList<TaskListener>(listeners);
+        List<TaskListener> newListeners = new ArrayList<TaskListener>(listeners);
         newListeners.add(listener);
         listeners = newListeners;
     }
 
     public synchronized void removeTaskListener(TaskListener listener) {
-        ArrayList<TaskListener> newListeners = new ArrayList<TaskListener>(listeners);
+        List<TaskListener> newListeners = new ArrayList<TaskListener>(listeners);
         newListeners.remove(listener);
         listeners = newListeners;
     }

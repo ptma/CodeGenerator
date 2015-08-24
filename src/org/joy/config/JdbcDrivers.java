@@ -80,7 +80,7 @@ public class JdbcDrivers implements Serializable {
                 }
             }
         } catch (Exception e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
         }
     }
 

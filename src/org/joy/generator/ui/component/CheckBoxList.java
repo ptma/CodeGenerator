@@ -35,7 +35,8 @@ public class CheckBoxList extends JList {
         initCheckBox();
     }
 
-    public CheckBoxList(final Vector<?> listData){
+    @SuppressWarnings("rawtypes")
+    public CheckBoxList(final Vector listData){
         super(listData);
         initCheckBox();
     }
@@ -99,27 +100,23 @@ public class CheckBoxList extends JList {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            throw new UnsupportedOperationException();
+
         }
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            throw new UnsupportedOperationException();
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            throw new UnsupportedOperationException();
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            throw new UnsupportedOperationException();
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            throw new UnsupportedOperationException();
         }
 
     }

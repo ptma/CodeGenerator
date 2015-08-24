@@ -224,7 +224,7 @@ public class Column implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         sb.append(javaProperty);
-        if (Character.isLowerCase(sb.charAt(0)) && (sb.length() == 1) && !Character.isUpperCase(sb.charAt(1))) {
+        if (Character.isLowerCase(sb.charAt(0)) && ((sb.length() == 1) || Character.isLowerCase(sb.charAt(1)))){
             sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
         }
 
@@ -241,7 +241,7 @@ public class Column implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         sb.append(javaProperty);
-        if (Character.isLowerCase(sb.charAt(0)) && (sb.length() == 1) && !Character.isUpperCase(sb.charAt(1))){
+        if (Character.isLowerCase(sb.charAt(0)) && ((sb.length() == 1) || Character.isLowerCase(sb.charAt(1)))){
             sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
         }
 

@@ -25,9 +25,10 @@ public class ObjectFactory {
         ObjectFactory.externalClassLoaders.add(classLoader);
     }
 
-    public static Class<?> externalClassForName(String type) throws ClassNotFoundException {
+    @SuppressWarnings("rawtypes")
+    public static Class externalClassForName(String type) throws ClassNotFoundException {
 
-        Class<?> clazz;
+        Class clazz;
 
         for (ClassLoader classLoader : externalClassLoaders) {
             try {
@@ -35,7 +36,7 @@ public class ObjectFactory {
                 clazz = Class.forName(type, true, classLoader);
                 return clazz;
             } catch (ClassNotFoundException e) {
-                LOGGER.info(e);
+                LOGGER.info(e.getMessage(), e);
             }
         }
 
@@ -49,7 +50,7 @@ public class ObjectFactory {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             clazz = Class.forName(type, true, cl);
         } catch (ClassNotFoundException e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
         }
 
         if (clazz == null) {
@@ -66,7 +67,7 @@ public class ObjectFactory {
             Class<?> clazz = externalClassForName(type);
             answer = clazz.newInstance();
         } catch (Exception e) {
-            throw new AppRuntimeException(Messages.getString("RuntimeError.5", type), e); //$NON-NLS-1$
+            throw new AppRuntimeException(Messages.getString(Messages.RUNTIME_ERROR_5, type), e);
         }
 
         return answer;

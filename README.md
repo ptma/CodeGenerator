@@ -64,9 +64,9 @@ CodeGenerator
 
     boolean      hasBigDecimalColumn 是否有 BigDecimal 字段
 
-    boolean      hasNotNullColumn    是否有非空的 String 字段
+    boolean      hasNotNullColumn    是否有非空的基本类型字段
 
-    boolean      hasNotBlankColumn   是否有非空的基本类型字段
+    boolean      hasNotBlankColumn   是否有非空的 String 字段
 
 ### column
 ####属性
@@ -109,19 +109,19 @@ CodeGenerator
     String  setterMethodName Set方法名
 
 ####方法
-    boolean isString()      是否是字符串
+    boolean isString()       是否是字符串
 
-    boolean isFloat()       是否是浮点类型
+    boolean isFloat()        是否是浮点类型
 
-    boolean isInteger()     是否是整形
+    boolean isInteger()      是否是整形
 
-    boolean isBigDecimal()  是否是BigDecimal类型
+    boolean isBigDecimal()   是否是BigDecimal类型
 
-    boolean isBoolean()     是否是布尔类型
+    boolean isBoolean()      是否是布尔类型
 
-    boolean isDate()        是否有日期类型，含Date、Timestamp、Time
+    boolean isDate()         是否有日期类型，含Date、Timestamp、Time
 
-    boolean isBLOB() 是否有 BLOB、CLOB、LONGVARCHAR、LONGVARBINARY或VARBINARY
+    boolean isBLOB()         是否有 BLOB、CLOB、LONGVARCHAR、LONGVARBINARY或VARBINARY
 
 ##作者
 ptma@163.com

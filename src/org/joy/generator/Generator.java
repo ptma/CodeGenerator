@@ -297,7 +297,7 @@ public class Generator extends JFrame {
                 ObjectFactory.addExternalClassLoader(classLoader);
             }
         } catch (Exception e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -305,7 +305,7 @@ public class Generator extends JFrame {
         try {
             typeMapping.loadMappgin();
         } catch (Exception e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -353,7 +353,7 @@ public class Generator extends JFrame {
             tablesTreeModel.reload();
             rs.close();
         } catch (SQLException e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -402,7 +402,7 @@ public class Generator extends JFrame {
                     loadTableTree(databaseElement.getSchema());
                 }
             } catch (ApplicationException e) {
-                LOGGER.info(e);
+                LOGGER.info(e.getMessage(), e);
                 JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -545,7 +545,7 @@ public class Generator extends JFrame {
             resizeTableGrid(true);
             btnGenerate.setEnabled(true);
         } catch (Exception e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -571,7 +571,7 @@ public class Generator extends JFrame {
                     frame.contentSplitPane.setDividerLocation(0.25);
 
                 } catch (Exception e) {
-                    LOGGER.info(e);
+                    LOGGER.info(e.getMessage(), e);
                 }
             }
         });
@@ -623,7 +623,7 @@ public class Generator extends JFrame {
 
         @Override
         public void taskError(Exception e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

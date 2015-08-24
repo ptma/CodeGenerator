@@ -112,11 +112,11 @@ public class DatabaseElement implements Serializable, Comparable<DatabaseElement
         try {
             conn = driver.connect(connectionUrl, props);
         } catch (SQLException e){
-            throw new AppRuntimeException(Messages.getString("RuntimeError.2"), e);
+            throw new AppRuntimeException(Messages.getString(Messages.RUNTIME_ERROR_2), e);
         }
 
         if (conn == null) {
-            throw new AppRuntimeException(Messages.getString("RuntimeError.2"));
+            throw new AppRuntimeException(Messages.getString(Messages.RUNTIME_ERROR_2));
         }
 
         return conn;
@@ -129,8 +129,8 @@ public class DatabaseElement implements Serializable, Comparable<DatabaseElement
             Class<?> clazz = ObjectFactory.externalClassForName(driverClass);
             driver = (Driver) clazz.newInstance();
         } catch (Exception e) {
-            LOGGER.info(e);
-            throw new AppRuntimeException(Messages.getString("RuntimeError.3"), e);
+            LOGGER.info(e.getMessage(), e);
+            throw new AppRuntimeException(Messages.getString(Messages.RUNTIME_ERROR_3), e);
         }
         return driver;
     }

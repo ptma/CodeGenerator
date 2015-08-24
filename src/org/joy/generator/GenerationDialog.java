@@ -275,7 +275,7 @@ public class GenerationDialog extends JDialog {
                     templateEngine.processToFile(model, templateElement);
                 }
             } catch (Exception e) {
-                LOGGER.info(e);
+                LOGGER.info(e.getMessage(), e);
                 JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
             }
         }

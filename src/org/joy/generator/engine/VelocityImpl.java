@@ -37,16 +37,16 @@ public class VelocityImpl implements TemplateEngine {
 
     private static final String ENCODING = "UTF-8";
 
-    private static final VelocityEngine engine = new VelocityEngine();
+    private static final VelocityEngine velocityEngine = new VelocityEngine();
 
     public VelocityImpl(String classPath){
-        Properties props = new Properties();
+        final Properties props = new Properties();
         props.setProperty(Velocity.INPUT_ENCODING, ENCODING);
         props.setProperty(Velocity.OUTPUT_ENCODING, ENCODING);
         props.setProperty(Velocity.ENCODING_DEFAULT, ENCODING);
         props.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, NullLogChute.class.getName());
         props.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, classPath + "templates/velocity");
-        engine.init(props);
+        velocityEngine.init(props);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class VelocityImpl implements TemplateEngine {
         try {
             VelocityContext context = new VelocityContext(model);
             StringWriter writer = new StringWriter();
-            engine.evaluate(context, writer, "", stringTemplate);
+            velocityEngine.evaluate(context, writer, "", stringTemplate);
             return writer.toString();
         } catch (Exception e) {
             throw new TemplateEngineException(e.getMessage(), e);
@@ -65,7 +65,7 @@ public class VelocityImpl implements TemplateEngine {
     public void processToFile(Map<String, Object> model, TemplateElement templateElement)
                                                                                          throws TemplateEngineException {
         try {
-            Template template = engine.getTemplate(templateElement.getTemplateFile(), templateElement.getEncoding());
+            Template template = velocityEngine.getTemplate(templateElement.getTemplateFile(), templateElement.getEncoding());
             VelocityContext context = new VelocityContext(model);
 
             String targetPath = StringUtil.packagePathToFilePath(processToString(model, templateElement.getTargetPath()));

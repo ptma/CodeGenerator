@@ -62,15 +62,18 @@ public class StringUtil {
                 case ' ':
                 case '/':
                 case '&':
-                    nextUpperCase = sb.length() > 0;
+                    if (sb.length() > 0) {
+                        nextUpperCase = true;
+                    }
                     break;
 
                 default:
                     if (nextUpperCase) {
-                        c = Character.toUpperCase(c);
+                        sb.append(Character.toUpperCase(c));
+                        nextUpperCase = false;
+                    } else {
+                        sb.append(Character.toLowerCase(c));
                     }
-                    nextUpperCase = false;
-                    sb.append(c);
                     break;
             }
         }

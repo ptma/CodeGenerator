@@ -29,13 +29,13 @@ public class ClassloaderUtility {
                 file = new File(jarPath);
                 LOGGER.debug("Loading jar : " + file.getPath());
                 if (!file.exists()) {
-                    throw new AppRuntimeException(Messages.getString("RuntimeError.4", classPathEntry));
+                    throw new AppRuntimeException(Messages.getString(Messages.RUNTIME_ERROR_4, classPathEntry));
                 }
 
                 try {
                     urls.add(file.toURI().toURL());
                 } catch (MalformedURLException e) {
-                    throw new AppRuntimeException(Messages.getString("RuntimeError.4", classPathEntry));
+                    throw new AppRuntimeException(Messages.getString(Messages.RUNTIME_ERROR_4, classPathEntry));
                 }
             }
         }

@@ -326,7 +326,7 @@ public class DbManagementDialog extends JDialog {
             }
             return dbItem;
         } catch (ApplicationException e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         } finally {
             try {
@@ -334,7 +334,7 @@ public class DbManagementDialog extends JDialog {
                     conn.close();
                 }
             } catch (SQLException e) {
-                LOGGER.info(e);
+                LOGGER.info(e.getMessage(), e);
             }
         }
         return null;

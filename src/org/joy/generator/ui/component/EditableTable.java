@@ -40,8 +40,9 @@ public class EditableTable extends JTable {
     /**
      * 返回数据类型
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public Class<?> getColumnClass(int myCol) {
+    public Class getColumnClass(int myCol) {
         return getValueAt(0, myCol).getClass();
     }
 

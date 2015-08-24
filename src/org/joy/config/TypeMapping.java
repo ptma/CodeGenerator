@@ -18,6 +18,7 @@ package org.joy.config;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -42,8 +43,8 @@ public class TypeMapping implements Serializable {
 
     private String               mappginFile;
 
-    private HashMap<Integer, String> typeMap;
-    private HashMap<Integer, String> fullTypeMap;
+    private Map<Integer, String> typeMap;
+    private Map<Integer, String> fullTypeMap;
 
     public TypeMapping(String classPath){
         this.mappginFile = classPath + MAPING_FILE;

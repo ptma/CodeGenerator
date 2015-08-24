@@ -16,7 +16,6 @@
 package org.joy.config;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,20 +44,18 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class Configuration implements Serializable {
-
-    private static final long serialVersionUID = -6808310529559677534L;
+public class Configuration {
 
     private static final Logger   LOGGER             = Logger.getLogger(Configuration.class);
 
     private static final String   CONFIGURATION_FILE = "configuration.xml";
     private String                configurationFile;
-    private ArrayList<DatabaseElement> connectionHistory;
-    private ArrayList<String>          classPathEntries;
+    private List<DatabaseElement> connectionHistory;
+    private List<String>          classPathEntries;
     private String                tagertProject;
     private String                basePackage;
     private String                moduleName;
-    private ArrayList<TemplateElement> templates;
+    private List<TemplateElement> templates;
 
     public Configuration(String classPath){
         this.configurationFile = classPath + CONFIGURATION_FILE;
@@ -89,7 +86,8 @@ public class Configuration implements Serializable {
     }
 
     private void parseClassPathEntry(Document doc, XPath path) throws XPathExpressionException {
-        NodeList classpathEntrys = (NodeList) path.evaluate("configuration/classpath/entry", doc, XPathConstants.NODESET);
+        NodeList classpathEntrys = (NodeList) path.evaluate("configuration/classpath/entry", doc,
+                                                            XPathConstants.NODESET);
         if (classpathEntrys != null) {
             for (int i = 0; i < classpathEntrys.getLength(); i++) {
                 String entry = parseElementNodeValue(classpathEntrys.item(i));
@@ -101,7 +99,8 @@ public class Configuration implements Serializable {
     }
 
     private void parseConnections(Document doc, XPath path) throws XPathExpressionException {
-        NodeList databaseList = (NodeList) path.evaluate("configuration/connections/database", doc, XPathConstants.NODESET);
+        NodeList databaseList = (NodeList) path.evaluate("configuration/connections/database", doc,
+                                                         XPathConstants.NODESET);
         if (databaseList != null) {
             for (int i = 0; i < databaseList.getLength(); i++) {
                 parseDatabase(databaseList.item(i), path);
@@ -124,7 +123,8 @@ public class Configuration implements Serializable {
     }
 
     private void parseTemplates(Document doc, XPath path) throws XPathExpressionException {
-        NodeList templateList = (NodeList) path.evaluate("configuration/templates/template", doc, XPathConstants.NODESET);
+        NodeList templateList = (NodeList) path.evaluate("configuration/templates/template", doc,
+                                                         XPathConstants.NODESET);
         if (templateList != null) {
             for (int i = 0; i < templateList.getLength(); i++) {
                 parseTemplate(templateList.item(i), path);
@@ -151,8 +151,10 @@ public class Configuration implements Serializable {
         if (StringUtil.isEmpty(name)) {
             name = templateFile;
         }
-        if (StringUtil.isNotEmpty(templateFile) && StringUtil.isNotEmpty(targetPath) && StringUtil.isNotEmpty(targetFileName)) {
-            TemplateElement templateElement = new TemplateElement(name, engine, templateFile, targetPath, targetFileName, encoding);
+        if (StringUtil.isNotEmpty(templateFile) && StringUtil.isNotEmpty(targetPath)
+            && StringUtil.isNotEmpty(targetFileName)) {
+            TemplateElement templateElement = new TemplateElement(name, engine, templateFile, targetPath,
+                                                                  targetFileName, encoding);
             templates.add(templateElement);
             templateElement.setSelected(Boolean.parseBoolean(parseAttributes(node).getProperty("selected")));
         }
@@ -268,7 +270,7 @@ public class Configuration implements Serializable {
             t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             t.transform(ds, sr);
         } catch (Exception e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
         }
     }
 

@@ -49,7 +49,7 @@ public abstract class Database {
                 rs.close();
             }
         } catch (SQLException e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
         }
     }
 
@@ -59,7 +59,7 @@ public abstract class Database {
                 st.close();
             }
         } catch (SQLException e) {
-            LOGGER.info(e);
+            LOGGER.info(e.getMessage(), e);
         }
     }
 }

@@ -9,6 +9,13 @@ public class Messages {
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
+    public static final String RUNTIME_ERROR_0 = "RuntimeError.0";
+    public static final String RUNTIME_ERROR_1 = "RuntimeError.1";
+    public static final String RUNTIME_ERROR_2 = "RuntimeError.2";
+    public static final String RUNTIME_ERROR_3 = "RuntimeError.3";
+    public static final String RUNTIME_ERROR_4 = "RuntimeError.4";
+    public static final String RUNTIME_ERROR_5 = "RuntimeError.5";
+
     private Messages(){
     }
 

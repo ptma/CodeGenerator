@@ -30,27 +30,29 @@ public class JavaTypeResolver {
     private static Map<Integer, String> typeMap;
     private static Map<Integer, String> fullTypeMap;
 
-    private static final String         TYPE_BYTE         = "Byte";
-    private static final String         TYPE_SHORT        = "Short";
-    private static final String         TYPE_INTEGER      = "Integer";
-    private static final String         TYPE_LONG         = "Long";
-    private static final String         TYPE_FLOAT        = "Float";
-    private static final String         TYPE_DOUBLE       = "Double";
-    private static final String         TYPE_STRING       = "String";
-    private static final String         TYPE_BOOLEAN      = "Boolean";
-    private static final String         TYPE_OBJECT       = "Object";
-    private static final String         TYPE_BYTE_ARRAY   = "byte[]";
+    private static final String         TYPE_BYTE            = "Byte";
+    private static final String         TYPE_SHORT           = "Short";
+    private static final String         TYPE_INTEGER         = "Integer";
+    private static final String         TYPE_LONG            = "Long";
+    private static final String         TYPE_FLOAT           = "Float";
+    private static final String         TYPE_DOUBLE          = "Double";
+    private static final String         TYPE_STRING          = "String";
+    private static final String         TYPE_BOOLEAN         = "Boolean";
+    private static final String         TYPE_OBJECT          = "Object";
+    private static final String         TYPE_BYTE_ARRAY      = "byte[]";
+    private static final String         TYPE_BIGDECIMAL      = "BigDecimal";
 
-    private static final String         FULL_TYPE_BYTE    = "java.lang.Byte";
-    private static final String         FULL_TYPE_SHORT   = "java.lang.Short";
-    private static final String         FULL_TYPE_INTEGER = "java.lang.Integer";
-    private static final String         FULL_TYPE_LONG    = "java.lang.Long";
-    private static final String         FULL_TYPE_FLOAT   = "java.lang.Float";
-    private static final String         FULL_TYPE_DOUBLE  = "java.lang.Double";
-    private static final String         FULL_TYPE_STRING  = "java.lang.String";
-    private static final String         FULL_TYPE_BOOLEAN = "java.lang.Boolean";
-    private static final String         FULL_TYPE_OBJECT  = "java.lang.Object";
-    private static final String         FULL_TYPE_DATE    = "java.util.Date";
+    private static final String         FULL_TYPE_BYTE       = "java.lang.Byte";
+    private static final String         FULL_TYPE_SHORT      = "java.lang.Short";
+    private static final String         FULL_TYPE_INTEGER    = "java.lang.Integer";
+    private static final String         FULL_TYPE_LONG       = "java.lang.Long";
+    private static final String         FULL_TYPE_FLOAT      = "java.lang.Float";
+    private static final String         FULL_TYPE_DOUBLE     = "java.lang.Double";
+    private static final String         FULL_TYPE_STRING     = "java.lang.String";
+    private static final String         FULL_TYPE_BOOLEAN    = "java.lang.Boolean";
+    private static final String         FULL_TYPE_OBJECT     = "java.lang.Object";
+    private static final String         FULL_TYPE_DATE       = "java.util.Date";
+    private static final String         FULL_TYPE_BIGDECIMAL = "java.math.BigDecimal";
 
     static {
         typeMap = new HashMap<Integer, String>();
@@ -150,7 +152,7 @@ public class JavaTypeResolver {
 
     private static String calculateNumericType(Column column) {
         if (column.getDecimalDigits() > 0 || column.getSize() > 18 || forceBigDecimals) {
-            return "BigDecimal";
+            return TYPE_BIGDECIMAL;
         } else if (column.getSize() > 9) {
             return TYPE_LONG;
         } else if (column.getSize() > 4) {
@@ -184,7 +186,7 @@ public class JavaTypeResolver {
 
     private static String calculateFullNumericType(Column column) {
         if (column.getDecimalDigits() > 0 || column.getSize() > 18 || forceBigDecimals) {
-            return "java.math.BigDecimal";
+            return FULL_TYPE_BIGDECIMAL;
         } else if (column.getSize() > 9) {
             return FULL_TYPE_LONG;
         } else if (column.getSize() > 4) {
@@ -203,7 +205,7 @@ public class JavaTypeResolver {
         for (String itemValue : javaTypeSet) {
             values[index++] = itemValue;
         }
-        values[index++] = "BigDecimal";
+        values[index++] = TYPE_BIGDECIMAL;
         return values;
     }
 
@@ -228,7 +230,7 @@ public class JavaTypeResolver {
     }
 
     public static boolean isBigDecimal(String javaType) {
-        return "java.math.BigDecimal".equals(javaType);
+        return FULL_TYPE_BIGDECIMAL.equals(javaType);
     }
 
     public static boolean isInteger(String javaType) {
