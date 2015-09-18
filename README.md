@@ -60,6 +60,10 @@ CodeGenerator
 
     List<Column> columns             所有字段  == primaryKeys + baseColumns
 
+    List<Key>    importedKeys        所有 importedKeys
+
+    List<Key>    exportedKeys        所有 exportedKeys
+
     boolean      hasDateColumn       是否有日期类型字段
 
     boolean      hasBigDecimalColumn 是否有 BigDecimal 字段
@@ -68,60 +72,70 @@ CodeGenerator
 
     boolean      hasNotBlankColumn   是否有非空的 String 字段
 
-### column
+### Column
 ####属性
-    String	columnName       字段名
+    String	columnName        字段名
 
-    boolean isPrimaryKey     是否为主键
+    boolean primaryKey        是否为主键
 
-    boolean isForeignKey     是否为外键
+    boolean foreignKey        是否为外键
 
-    int     size             字段长度
+    int     size              字段长度
 
-    int     decimalDigits    小数位长度
+    int     decimalDigits     小数位长度
 
-    boolean nullable         是否可空
+    boolean nullable          是否可空
 
-    boolean unique           是否唯一值
+    boolean unique            是否唯一值
 
-    String  defaultValue     默认值
+    boolean indexed           是否有索引
 
-    String  remarks          注释
+    String  defaultValue      默认值
 
-    String  remarksUnicode   数字转Unicode后的字符串
+    String  remarks           注释
 
-    int     jdbcType         对应 java.sql.Types
+    String  remarksUnicode    数字转Unicode后的字符串
 
-    String  jdbcTypeName     对应jdbcType的名称
+    int     jdbcType          对应 java.sql.Types
 
-    String  javaProperty     属性名
+    String  jdbcTypeName      对应jdbcType的名称
 
-    String  javaType         java类型，比如String
+    String  javaProperty      属性名
 
-    String  fullJavaType     完整的Java类型，比如 java.lang.String
+    String  javaType          java类型，比如String
 
-    String  pkTableName      外键表表名
+    String  fullJavaType      完整的Java类型，比如 java.lang.String
 
-    String  pkColumnName     外键表字段名
+    String  getterMethodName  Get方法名
 
-    String  getterMethodName Get方法名
-
-    String  setterMethodName Set方法名
+    String  setterMethodName  Set方法名
 
 ####方法
-    boolean isString()       是否是字符串
+    boolean isString()        是否是字符串
 
-    boolean isFloat()        是否是浮点类型
+    boolean isFloatNumber()   是否是浮点型，含Float、Double、BigDecimal
 
-    boolean isInteger()      是否是整形
+    boolean isIntegerNumber() 是否是整型，含Byte、Short、Integer、Long
 
-    boolean isBigDecimal()   是否是BigDecimal类型
+    boolean isBigDecimal()    是否是BigDecimal类型
 
-    boolean isBoolean()      是否是布尔类型
+    boolean isBoolean()       是否是布尔类型
 
-    boolean isDate()         是否有日期类型，含Date、Timestamp、Time
+    boolean isDate()          是否有日期类型，含Date、Timestamp、Time
 
-    boolean isBLOB()         是否有 BLOB、CLOB、LONGVARCHAR、LONGVARBINARY或VARBINARY
+    boolean isBLOB()          是否有 BLOB、CLOB、LONGVARCHAR、LONGVARBINARY或VARBINARY
+
+### Key
+    String  pkTableName       PKTABLE_NAME
+
+    String  pkColumnName      PKCOLUMN_NAME
+
+    String  fkTableName       FKTABLE_NAME
+
+    String  fkColumnName      FKCOLUMN_NAME
+
+    Integer seq               KEY_SEQ
+
 
 ##作者
 ptma@163.com

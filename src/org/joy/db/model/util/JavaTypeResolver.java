@@ -233,6 +233,10 @@ public class JavaTypeResolver {
         return FULL_TYPE_BIGDECIMAL.equals(javaType);
     }
 
+    public static boolean isBigInteger(String javaType) {
+        return "java.math.BigInteger".equals(javaType);
+    }
+
     public static boolean isInteger(String javaType) {
         return "int".equals(javaType) || FULL_TYPE_INTEGER.equals(javaType);
     }

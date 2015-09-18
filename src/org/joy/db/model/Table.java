@@ -22,17 +22,19 @@ import org.joy.util.StringUtil;
 
 public class Table implements java.io.Serializable {
 
-    private static final long serialVersionUID  = -7246043091254837124L;
+    private static final long serialVersionUID = -7246043091254837124L;
     private String            tableName;
     private String            tableType;
     private String            tableAlias;
     private String            remarks;
     private String            className;
     private String            javaProperty;
-    private String            catalog           = null;
-    private String            schema            = null;
-    private List<Column>      baseColumns       = new ArrayList<Column>();
-    private List<Column>      primaryKeys = new ArrayList<Column>();
+    private String            catalog          = null;
+    private String            schema           = null;
+    private List<Column>      baseColumns      = new ArrayList<Column>();
+    private List<Column>      primaryKeys      = new ArrayList<Column>();
+    private List<Key>         importedKeys     = new ArrayList<Key>();
+    private List<Key>         exportedKeys     = new ArrayList<Key>();
 
     public Table(){
     }
@@ -187,4 +189,21 @@ public class Table implements java.io.Serializable {
         return false;
     }
 
+
+    public List<Key> getImportedKeys() {
+        return importedKeys;
+    }
+
+
+    public List<Key> getExportedKeys() {
+        return exportedKeys;
+    }
+
+    public void addImportedKey(Key importedKey) {
+        this.importedKeys.add(importedKey);
+    }
+
+    public void addExportedKey(Key exportedKey) {
+        this.exportedKeys.add(exportedKey);
+    }
 }

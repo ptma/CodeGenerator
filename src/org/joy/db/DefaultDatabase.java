@@ -22,18 +22,28 @@ import java.sql.SQLException;
 
 import org.joy.config.TypeMapping;
 import org.joy.db.model.Column;
+import org.joy.db.model.Key;
 import org.joy.db.model.Table;
 import org.joy.db.model.util.JdbcTypeResolver;
 import org.joy.util.StringUtil;
 
 public class DefaultDatabase extends Database {
 
-    private static final String COLUMN_NAME = "COLUMN_NAME";
+    private static final String COLUMN_NAME   = "COLUMN_NAME";
+
+    public static final String  PKTABLE_NAME  = "PKTABLE_NAME";
+    public static final String  PKCOLUMN_NAME = "PKCOLUMN_NAME";
+    public static final String  FKTABLE_NAME  = "FKTABLE_NAME";
+    public static final String  FKCOLUMN_NAME = "FKCOLUMN_NAME";
+    public static final String  KEY_SEQ       = "KEY_SEQ";
 
     public DefaultDatabase(Connection connection, TypeMapping typeMapping){
         super(connection, typeMapping);
     }
 
+    /* (non-Javadoc)
+     * @see org.joy.db.Database#getTable(java.lang.String, java.lang.String, java.lang.String)
+     */
     @Override
     public Table getTable(String catalog, String schema, String tableName) throws SQLException {
         ResultSet rs = null;
@@ -55,6 +65,7 @@ public class DefaultDatabase extends Database {
                 introspectPrimaryKeys(table);
                 introspectColumns(table);
                 introspectForeignKeys(table);
+                introspectExportedKeys(table);
                 introspectIndex(table);
             }
         } catch (SQLException e) {
@@ -127,18 +138,47 @@ public class DefaultDatabase extends Database {
         try {
             rs = connection.getMetaData().getImportedKeys(null, table.getSchema(), table.getTableName());
             while (rs.next()) {
-                String columnName = rs.getString("FKCOLUMN_NAME");
+                String columnName = rs.getString(FKCOLUMN_NAME);
                 if (StringUtil.isEmpty(columnName)) {
                     continue;
                 }
-                String pkTableName = rs.getString("PKTABLE_NAME");
-                String pkColumnName = rs.getString("PKCOLUMN_NAME");
+
                 Column column = table.getColumn(columnName);
                 if (column != null) {
                     column.setForeignKey(true);
-                    column.setPkTableName(pkTableName);
-                    column.setPkColumnName(pkColumnName);
                 }
+                String pkTableName = rs.getString(PKTABLE_NAME);
+                String pkColumnName = rs.getString(PKCOLUMN_NAME);
+                String fkTableName = rs.getString(FKTABLE_NAME);
+                String fkColumnName = rs.getString(FKCOLUMN_NAME);
+                String seq = rs.getString(KEY_SEQ);
+                Integer iseq = new Integer(seq);
+                table.addImportedKey(new Key(pkTableName, pkColumnName, fkTableName, fkColumnName, iseq));
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            close(rs);
+        }
+    }
+
+    // 获得外键的信息
+    protected void introspectExportedKeys(Table table) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = connection.getMetaData().getExportedKeys(null, table.getSchema(), table.getTableName());
+            while (rs.next()) {
+                String columnName = rs.getString(FKCOLUMN_NAME);
+                if (StringUtil.isEmpty(columnName)) {
+                    continue;
+                }
+                String pkTableName = rs.getString(PKTABLE_NAME);
+                String pkColumnName = rs.getString(PKCOLUMN_NAME);
+                String fkTableName = rs.getString(FKTABLE_NAME);
+                String fkColumnName = rs.getString(FKCOLUMN_NAME);
+                String seq = rs.getString(KEY_SEQ);
+                Integer iseq = new Integer(seq);
+                table.addExportedKey(new Key(pkTableName, pkColumnName, fkTableName, fkColumnName, iseq));
             }
         } catch (SQLException e) {
             throw e;
@@ -160,6 +200,7 @@ public class DefaultDatabase extends Database {
                 Column column = table.getColumn(columnName);
                 if (column != null) {
                     column.setUnique(!rs.getBoolean("NON_UNIQUE"));
+                    column.setIndexed(true);
                 }
             }
         } catch (SQLException e) {

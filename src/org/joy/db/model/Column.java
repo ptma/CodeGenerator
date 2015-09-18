@@ -22,17 +22,13 @@ import org.joy.util.StringUtil;
 
 public class Column implements Serializable {
 
-    private static final long serialVersionUID = 241462432312500261L;
+    private static final long serialVersionUID = 6987289314682844881L;
 
     private String            columnName;
 
-    private boolean           isPrimaryKey;
+    private boolean           primaryKey;
 
-    private boolean           isForeignKey;
-
-    private String            pkTableName;
-
-    private String            pkColumnName;
+    private boolean           foreignKey;
 
     private int               size;
 
@@ -41,6 +37,8 @@ public class Column implements Serializable {
     private boolean           nullable;
 
     private boolean           unique;
+
+    private boolean           indexed;
 
     private boolean           autoincrement;
 
@@ -149,24 +147,14 @@ public class Column implements Serializable {
         return JavaTypeResolver.isString(javaType);
     }
 
-    public boolean isFloat() {
-        return JavaTypeResolver.isFloat(javaType);
+    public boolean isFloatNumber() {
+        return JavaTypeResolver.isFloat(javaType) || JavaTypeResolver.isDouble(javaType)
+               || JavaTypeResolver.isBigDecimal(javaType) || JavaTypeResolver.isBigInteger(javaType);
     }
 
-    public boolean isInteger() {
-        return JavaTypeResolver.isInteger(javaType);
-    }
-
-    public boolean isLong() {
-        return JavaTypeResolver.isLong(javaType);
-    }
-
-    public boolean isShort() {
-        return JavaTypeResolver.isShort(javaType);
-    }
-
-    public boolean isByte() {
-        return JavaTypeResolver.isByte(javaType);
+    public boolean isIntegerNumber() {
+        return JavaTypeResolver.isByte(javaType) || JavaTypeResolver.isShort(javaType)
+               || JavaTypeResolver.isInteger(javaType) || JavaTypeResolver.isLong(javaType);
     }
 
     public boolean isBigDecimal() {
@@ -201,19 +189,19 @@ public class Column implements Serializable {
     }
 
     public boolean isPrimaryKey() {
-        return isPrimaryKey;
+        return primaryKey;
     }
 
-    public void setPrimaryKey(boolean isPrimaryKey) {
-        this.isPrimaryKey = isPrimaryKey;
+    public void setPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
     public boolean isForeignKey() {
-        return isForeignKey;
+        return foreignKey;
     }
 
-    public void setForeignKey(boolean isForeignKey) {
-        this.isForeignKey = isForeignKey;
+    public void setForeignKey(boolean foreignKey) {
+        this.foreignKey = foreignKey;
     }
 
     public void setJavaProperty(String javaProperty) {
@@ -224,7 +212,7 @@ public class Column implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         sb.append(javaProperty);
-        if (Character.isLowerCase(sb.charAt(0)) && ((sb.length() == 1) || Character.isLowerCase(sb.charAt(1)))){
+        if (Character.isLowerCase(sb.charAt(0)) && ((sb.length() == 1) || Character.isLowerCase(sb.charAt(1)))) {
             sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
         }
 
@@ -241,7 +229,7 @@ public class Column implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         sb.append(javaProperty);
-        if (Character.isLowerCase(sb.charAt(0)) && ((sb.length() == 1) || Character.isLowerCase(sb.charAt(1)))){
+        if (Character.isLowerCase(sb.charAt(0)) && ((sb.length() == 1) || Character.isLowerCase(sb.charAt(1)))) {
             sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
         }
 
@@ -266,28 +254,20 @@ public class Column implements Serializable {
         this.editor = editor;
     }
 
-    public String getPkTableName() {
-        return pkTableName;
-    }
-
-    public void setPkTableName(String pkTableName) {
-        this.pkTableName = pkTableName;
-    }
-
-    public String getPkColumnName() {
-        return pkColumnName;
-    }
-
-    public void setPkColumnName(String pkColumnName) {
-        this.pkColumnName = pkColumnName;
-    }
-
     public boolean isAutoincrement() {
         return autoincrement;
     }
 
     public void setAutoincrement(boolean autoincrement) {
         this.autoincrement = autoincrement;
+    }
+
+    public boolean isIndexed() {
+        return indexed;
+    }
+
+    public void setIndexed(boolean indexed) {
+        this.indexed = indexed;
     }
 
 }

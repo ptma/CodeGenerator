@@ -37,6 +37,14 @@ public abstract class Database {
         this.typeMapping = typeMapping;
     }
 
+    /**
+     * 获得表模型
+     * @param catalog
+     * @param schema
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
     public abstract Table getTable(String catalog, String schema, String tableName) throws SQLException;
 
     public Connection getConnection() {
