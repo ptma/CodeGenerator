@@ -65,6 +65,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
+import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 import org.joy.config.Configuration;
 import org.joy.config.TypeMapping;
 import org.joy.config.model.DatabaseElement;
@@ -88,7 +89,9 @@ public class Generator extends JFrame {
 
     private static final long      serialVersionUID    = -7813705897974255551L;
 
-    private static Font            font                = new Font("宋体", Font.PLAIN, 12);
+    private static Font            FONT_SONG           = new Font("宋体", Font.PLAIN, 12);
+    private static Font            FONT_YAHEI          = new Font("微软雅黑", Font.PLAIN, 12);
+
     private String[]               headers             = { "字段名", "字段类型", "JAVA类型", "大小", "主键", "唯一", "自增", "外键", "可空",
                         "默认值", "注释"                   };
     public static final int        IDX_COLUMN_JAVATYPE = 2;
@@ -134,6 +137,7 @@ public class Generator extends JFrame {
     public Generator(){
         setTitle("CodeGenerator");
         addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowClosing(WindowEvent e) {
                 shutdown();
@@ -279,7 +283,7 @@ public class Generator extends JFrame {
 
         mntmConnect.setEnabled(true);
         mntmDisconnect.setEnabled(false);
-        initGlobalFont(font);
+        initGlobalFont(FONT_YAHEI);
         initSettings();
     }
 
@@ -559,6 +563,13 @@ public class Generator extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
+        try {
+            //设置本属性将改变窗口边框样式定义
+            BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.translucencySmallShadow;
+            org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
+        } catch (Exception e) {
+        }
+
         EventQueue.invokeLater(new Runnable() {
 
             @Override
