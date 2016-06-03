@@ -85,18 +85,20 @@ import org.joy.util.StringUtil;
 
 public class Generator extends JFrame {
 
-    private static final Logger    LOGGER              = Logger.getLogger(Generator.class);
+    private static final Logger    LOGGER                = Logger.getLogger(Generator.class);
 
-    private static final long      serialVersionUID    = -7813705897974255551L;
+    private static final long      serialVersionUID      = -7813705897974255551L;
 
-    private static Font            FONT_SONG           = new Font("宋体", Font.PLAIN, 12);
-    private static Font            FONT_YAHEI          = new Font("微软雅黑", Font.PLAIN, 12);
+    private static Font            FONT_YAHEI            = new Font("微软雅黑", Font.PLAIN, 12);
 
-    private String[]               headers             = { "字段名", "字段类型", "JAVA类型", "大小", "主键", "唯一", "自增", "外键", "可空",
-                        "默认值", "注释"                   };
-    public static final int        IDX_COLUMN_JAVATYPE = 2;
-    public static final int        IDX_COLUMN_NULLABLE = 8;
-    public static final int        IDX_COLUMN_REMARK   = 10;
+    private String[]               headers               = { "字段名", "字段类型", "JAVA类型", "大小", "主键", "唯一", "自增", "外键",
+                        "可空", "默认值", "显示", "可搜索", "数据字典", "注释" };
+    public static final int        IDX_COLUMN_JAVATYPE   = 2;
+    public static final int        IDX_COLUMN_NULLABLE   = 8;
+    public static final int        IDX_COLUMN_DISPLAY    = 10;
+    public static final int        IDX_COLUMN_SEARCHABLE = 11;
+    public static final int        IDX_COLUMN_DICT       = 12;
+    public static final int        IDX_COLUMN_REMARK     = 13;
 
     private JPanel                 contentPane;
     private JSplitPane             contentSplitPane;
@@ -109,9 +111,9 @@ public class Generator extends JFrame {
     private DefaultMutableTreeNode tablesNode;
     private DefaultMutableTreeNode viewsNode;
 
-    private ImageIcon              folderIcon          = createImageIcon("icon/folder.png");
-    private ImageIcon              tableIcon           = createImageIcon("icon/table.png");
-    private ImageIcon              viewIcon            = createImageIcon("icon/view.png");
+    private ImageIcon              folderIcon            = createImageIcon("icon/folder.png");
+    private ImageIcon              tableIcon             = createImageIcon("icon/table.png");
+    private ImageIcon              viewIcon              = createImageIcon("icon/view.png");
 
     private JPopupMenu             tablesTreePopupMenu;
     private JMenuItem              mntmTableInfo;
@@ -481,7 +483,9 @@ public class Generator extends JFrame {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == IDX_COLUMN_JAVATYPE || column == IDX_COLUMN_NULLABLE || column == IDX_COLUMN_REMARK;
+                return column == IDX_COLUMN_JAVATYPE || column == IDX_COLUMN_NULLABLE || column == IDX_COLUMN_DISPLAY
+                                || column == IDX_COLUMN_SEARCHABLE || column == IDX_COLUMN_DICT
+                       || column == IDX_COLUMN_REMARK;
             }
         };
         tableGridModel.addTableModelListener(new MyTableModelListener());
@@ -542,6 +546,9 @@ public class Generator extends JFrame {
                 cellData[row][col++] = item.isForeignKey();
                 cellData[row][col++] = item.isNullable();
                 cellData[row][col++] = item.getDefaultValue();
+                cellData[row][col++] = item.isDisplay();
+                cellData[row][col++] = item.isSearchable();
+                cellData[row][col++] = item.getDict();
                 cellData[row][col++] = item.getRemarks();
                 row++;
             }
@@ -564,7 +571,7 @@ public class Generator extends JFrame {
      */
     public static void main(String[] args) {
         try {
-            //设置本属性将改变窗口边框样式定义
+            // 设置本属性将改变窗口边框样式定义
             BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.translucencySmallShadow;
             org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
         } catch (Exception e) {
@@ -654,6 +661,12 @@ public class Generator extends JFrame {
                         column.setNullable(Boolean.parseBoolean(value));
                     } else if (e.getColumn() == IDX_COLUMN_REMARK) {
                         column.setRemarks(value);
+                    } else if (e.getColumn() == IDX_COLUMN_DISPLAY) {
+                        column.setDisplay(Boolean.parseBoolean(value));
+                    } else if (e.getColumn() == IDX_COLUMN_SEARCHABLE) {
+                        column.setSearchable(Boolean.parseBoolean(value));
+                    } else if (e.getColumn() == IDX_COLUMN_DICT) {
+                        column.setDict(value);
                     }
                 }
             }

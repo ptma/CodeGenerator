@@ -53,6 +53,9 @@ public class Column implements Serializable {
     private String            javaType;
     private String            fullJavaType;
     private String            editor;
+    private boolean           display          = true;
+    private boolean           searchable;
+    private String            dict = "";
 
     public Column(String columnName){
         this.columnName = columnName;
@@ -268,6 +271,33 @@ public class Column implements Serializable {
 
     public void setIndexed(boolean indexed) {
         this.indexed = indexed;
+    }
+
+    public boolean isDisplay() {
+        return display;
+    }
+
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
+    public boolean isSearchable() {
+        return searchable;
+    }
+
+    public void setSearchable(boolean searchable) {
+        this.searchable = searchable;
+    }
+
+    public String getDict() {
+        return dict;
+    }
+
+    public boolean isHasDict() {
+        return StringUtil.isNotEmpty(dict);
+    }
+    public void setDict(String dict) {
+        this.dict = dict;
     }
 
 }

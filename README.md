@@ -110,6 +110,13 @@ CodeGenerator
 
     String  setterMethodName  Set方法名
 
+    boolean display			  是否显示
+
+    boolean searchable		  是否可搜索
+
+    String  dict			  数据字典名
+
+
 ####方法
     boolean isString()        是否是字符串
 

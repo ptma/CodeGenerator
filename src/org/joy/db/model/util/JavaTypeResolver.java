@@ -246,7 +246,7 @@ public class JavaTypeResolver {
     }
 
     public static boolean isString(String javaType) {
-        return FULL_TYPE_STRING.equals(javaType);
+        return FULL_TYPE_STRING.equals(javaType) || "String".equals(javaType);
     }
 
     public static boolean isBoolean(String javaType) {
