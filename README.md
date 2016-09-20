@@ -72,9 +72,10 @@ CodeGenerator
 
     boolean      hasNotBlankColumn   是否有非空的 String 字段
 
+
 ### Column
 ####属性
-    String	columnName        字段名
+    String  columnName        字段名
 
     boolean primaryKey        是否为主键
 
@@ -85,6 +86,8 @@ CodeGenerator
     int     decimalDigits     小数位长度
 
     boolean nullable          是否可空
+
+    boolean autoincrement     是否自增
 
     boolean unique            是否唯一值
 
@@ -110,11 +113,11 @@ CodeGenerator
 
     String  setterMethodName  Set方法名
 
-    boolean display			  是否显示
+    boolean display           是否显示
 
-    boolean searchable		  是否可搜索
+    boolean searchable        是否可搜索
 
-    String  dict			  数据字典名
+    String  dict              数据字典名
 
 
 ####方法
@@ -131,6 +134,8 @@ CodeGenerator
     boolean isDate()          是否有日期类型，含Date、Timestamp、Time
 
     boolean isBLOB()          是否有 BLOB、CLOB、LONGVARCHAR、LONGVARBINARY或VARBINARY
+
+    boolean hasDict()         是否使用了数据字典
 
 ### Key
     String  pkTableName       PKTABLE_NAME

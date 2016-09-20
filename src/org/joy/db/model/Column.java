@@ -293,7 +293,7 @@ public class Column implements Serializable {
         return dict;
     }
 
-    public boolean isHasDict() {
+    public boolean hasDict() {
         return StringUtil.isNotEmpty(dict);
     }
     public void setDict(String dict) {
