@@ -105,7 +105,9 @@ CodeGenerator
 
     String  javaProperty      属性名
 
-    String  javaType          java类型，比如String
+    String  javaType          java类型，比如String、Long、Integer
+
+    String  javaPrimitiveType java基本类型，如果不是基本类型时等同于 javaType
 
     String  fullJavaType      完整的Java类型，比如 java.lang.String
 
@@ -134,6 +136,8 @@ CodeGenerator
     boolean isDate()          是否有日期类型，含Date、Timestamp、Time
 
     boolean isBLOB()          是否有 BLOB、CLOB、LONGVARCHAR、LONGVARBINARY或VARBINARY
+
+    boolean isPrimitiveType() 是否是基本类型
 
     boolean hasDict()         是否使用了数据字典
 

@@ -210,23 +210,27 @@ public class JavaTypeResolver {
     }
 
     public static boolean isDouble(String javaType) {
-        return "double".equals(javaType) || FULL_TYPE_DOUBLE.equals(javaType);
+        return "double".equals(javaType) || TYPE_DOUBLE.equals(javaType) || FULL_TYPE_DOUBLE.equals(javaType);
     }
 
     public static boolean isFloat(String javaType) {
-        return "float".equals(javaType) || FULL_TYPE_FLOAT.equals(javaType);
+        return "float".equals(javaType) || TYPE_FLOAT.equals(javaType) || FULL_TYPE_FLOAT.equals(javaType);
     }
 
     public static boolean isLong(String javaType) {
-        return "long".equals(javaType) || FULL_TYPE_LONG.equals(javaType);
+        return "long".equals(javaType) || TYPE_LONG.equals(javaType) || FULL_TYPE_LONG.equals(javaType);
     }
 
     public static boolean isShort(String javaType) {
-        return "short".equals(javaType) || FULL_TYPE_SHORT.equals(javaType);
+        return "short".equals(javaType) || TYPE_SHORT.equals(javaType) || FULL_TYPE_SHORT.equals(javaType);
     }
 
     public static boolean isByte(String javaType) {
-        return "byte".equals(javaType) || FULL_TYPE_BYTE.equals(javaType);
+        return "byte".equals(javaType) || TYPE_BYTE.equals(javaType) || FULL_TYPE_BYTE.equals(javaType);
+    }
+
+    public static boolean isChar(String javaType) {
+        return "char".equals(javaType) || TYPE_BYTE.equals(javaType) || FULL_TYPE_BYTE.equals(javaType);
     }
 
     public static boolean isBigDecimal(String javaType) {
@@ -238,7 +242,7 @@ public class JavaTypeResolver {
     }
 
     public static boolean isInteger(String javaType) {
-        return "int".equals(javaType) || FULL_TYPE_INTEGER.equals(javaType);
+        return "int".equals(javaType) || TYPE_INTEGER.equals(javaType) || FULL_TYPE_INTEGER.equals(javaType);
     }
 
     public static boolean isDate(String javaType) {
@@ -250,6 +254,6 @@ public class JavaTypeResolver {
     }
 
     public static boolean isBoolean(String javaType) {
-        return "boolean".equals(javaType) || FULL_TYPE_BOOLEAN.equals(javaType);
+        return "boolean".equals(javaType) || TYPE_BOOLEAN.equals(javaType) || FULL_TYPE_BOOLEAN.equals(javaType);
     }
 }
