@@ -52,7 +52,7 @@ public class Configuration {
     private String                configurationFile;
     private List<DatabaseElement> connectionHistory;
     private List<String>          classPathEntries;
-    private String                tagertProject;
+    private String                targetProject;
     private String                basePackage;
     private String                moduleName;
     private List<TemplateElement> templates;
@@ -77,7 +77,7 @@ public class Configuration {
             parseConnections(doc, path);
             parseTemplates(doc, path);
 
-            tagertProject = path.evaluate("/configuration/tagertProject/text()", doc);
+            targetProject = path.evaluate("/configuration/tagertProject/text()", doc);
             basePackage = path.evaluate("/configuration/basePackage/text()", doc);
             moduleName = path.evaluate("/configuration/moduleName/text()", doc);
         } catch (Exception e) {
@@ -241,8 +241,8 @@ public class Configuration {
                 writeDatabase(connectionsEle, d);
             }
 
-            Element e = doc.createElement("tagertProject");
-            e.appendChild(doc.createTextNode(tagertProject));
+            Element e = doc.createElement("targetProject");
+            e.appendChild(doc.createTextNode(targetProject));
             root.appendChild(e);
 
             e = doc.createElement("basePackage");
@@ -316,12 +316,12 @@ public class Configuration {
         return classPathEntries;
     }
 
-    public String getTagertProject() {
-        return tagertProject;
+    public String getTargetProject() {
+        return targetProject;
     }
 
-    public void setTagertProject(String tagertProject) {
-        this.tagertProject = tagertProject;
+    public void setTargetProject(String targetProject) {
+        this.targetProject = targetProject;
     }
 
     public String getBasePackage() {
