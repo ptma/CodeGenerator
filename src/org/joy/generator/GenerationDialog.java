@@ -78,10 +78,10 @@ public class GenerationDialog extends JDialog {
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         contentPanel.setLayout(null);
 
-        JLabel lblTagertProject = new JLabel("代码保存路径");
-        lblTagertProject.setHorizontalAlignment(SwingConstants.TRAILING);
-        lblTagertProject.setBounds(10, 13, 72, 15);
-        contentPanel.add(lblTagertProject);
+        JLabel lblTargetProject = new JLabel("代码保存路径");
+        lblTargetProject.setHorizontalAlignment(SwingConstants.TRAILING);
+        lblTargetProject.setBounds(10, 13, 72, 15);
+        contentPanel.add(lblTargetProject);
 
         textTargetProject = new JTextField();
         textTargetProject.setBounds(92, 10, 311, 21);

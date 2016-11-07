@@ -77,7 +77,7 @@ public class Configuration {
             parseConnections(doc, path);
             parseTemplates(doc, path);
 
-            targetProject = path.evaluate("/configuration/tagertProject/text()", doc);
+            targetProject = path.evaluate("/configuration/targetProject/text()", doc);
             basePackage = path.evaluate("/configuration/basePackage/text()", doc);
             moduleName = path.evaluate("/configuration/moduleName/text()", doc);
         } catch (Exception e) {
