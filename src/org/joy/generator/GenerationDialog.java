@@ -191,7 +191,7 @@ public class GenerationDialog extends JDialog {
     }
 
     private void loadConfiguration() {
-        textTargetProject.setText(configuration.getTagertProject());
+        textTargetProject.setText(configuration.getTargetProject());
         textBasePackage.setText(configuration.getBasePackage());
         textModuleName.setText(configuration.getModuleName());
 
@@ -245,14 +245,14 @@ public class GenerationDialog extends JDialog {
     }
 
     private void processSelectedTemplates(Object[] selectedTemplateElements, String targetProject, String basePackage, String moduleName, String tableAlias){
-        configuration.setTagertProject(targetProject);
+        configuration.setTargetProject(targetProject);
         configuration.setBasePackage(basePackage);
         configuration.setModuleName(moduleName);
 
         tableModel.setTableAlias(tableAlias);
 
         Map<String, Object> model = new HashMap<String, Object>();
-        model.put("tagertProject", configuration.getTagertProject());
+        model.put("targetProject", configuration.getTargetProject());
         model.put("basePackage", configuration.getBasePackage());
         model.put("moduleName", configuration.getModuleName());
         model.put("table", tableModel);

@@ -13,7 +13,7 @@ CodeGenerator
             <entry>lib/mysql-connector-java-5.1.36-bin.jar</entry>
         </classpath>
         <!-- 代码生成目标基准目录 -->
-        <tagertProject>D:\temp</tagertProject>
+        <targetProject>D:\temp</targetProject>
         <!-- 基本包 -->
         <basePackage>org.joy</basePackage>
         <!-- 模块名 -->
@@ -24,7 +24,7 @@ CodeGenerator
                 <!-- 模板文件 -->
                 <templateFile>./entity.ftl</templateFile>
                 <!-- 文件路径 -->
-                <targetPath>${tagertProject}\src\${basePackage}\${moduleName}\entity\</targetPath>
+                <targetPath>${targetProject}\src\${basePackage}\${moduleName}\entity\</targetPath>
                 <!-- 文件名 -->
                 <targetFileName>${table.className}.java</targetFileName>
                 <!-- 文件编码 -->
@@ -35,7 +35,7 @@ CodeGenerator
 ```
 
 ##模板中可用的变量和方法
-    String       tagertProject       目标工程路径(代码保存的基准路径)
+    String       targetProject       目标工程路径(代码保存的基准路径)
     String       basePackage         基准包
     String       moduleName          模块名
 ### table 对象

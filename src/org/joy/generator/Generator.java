@@ -40,29 +40,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.text.Position;
+import javax.swing.tree.*;
 
 import org.apache.log4j.Logger;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
@@ -85,58 +72,58 @@ import org.joy.util.StringUtil;
 
 public class Generator extends JFrame {
 
-    private static final Logger    LOGGER                = Logger.getLogger(Generator.class);
+    private static final Logger LOGGER = Logger.getLogger(Generator.class);
 
-    private static final long      serialVersionUID      = -7813705897974255551L;
+    private static final long serialVersionUID = -7813705897974255551L;
 
-    private static Font            FONT_YAHEI            = new Font("微软雅黑", Font.PLAIN, 12);
+    private static Font FONT_YAHEI = new Font("微软雅黑", Font.PLAIN, 12);
 
-    private String[]               headers               = { "字段名", "字段类型", "JAVA类型", "大小", "主键", "唯一", "自增", "外键",
-                        "可空", "默认值", "显示", "可搜索", "数据字典", "注释" };
-    public static final int        IDX_COLUMN_JAVATYPE   = 2;
-    public static final int        IDX_COLUMN_NULLABLE   = 8;
-    public static final int        IDX_COLUMN_DISPLAY    = 10;
-    public static final int        IDX_COLUMN_SEARCHABLE = 11;
-    public static final int        IDX_COLUMN_DICT       = 12;
-    public static final int        IDX_COLUMN_REMARK     = 13;
+    private String[] headers = {"字段名", "字段类型", "JAVA类型", "大小", "主键", "唯一", "自增", "外键",
+            "可空", "默认值", "显示", "可搜索", "数据字典", "注释"};
+    public static final int IDX_COLUMN_JAVATYPE = 2;
+    public static final int IDX_COLUMN_NULLABLE = 8;
+    public static final int IDX_COLUMN_DISPLAY = 10;
+    public static final int IDX_COLUMN_SEARCHABLE = 11;
+    public static final int IDX_COLUMN_DICT = 12;
+    public static final int IDX_COLUMN_REMARK = 13;
 
-    private JPanel                 contentPane;
-    private JSplitPane             contentSplitPane;
-    private JMenuItem              mntmConnect;
-    private JMenuItem              mntmDisconnect;
+    private JPanel contentPane;
+    private JSplitPane contentSplitPane;
+    private JMenuItem mntmConnect;
+    private JMenuItem mntmDisconnect;
 
-    private DefaultTreeModel       tablesTreeModel;
-    private JTree                  tablesTree;
+    private DefaultTreeModel tablesTreeModel;
+    private JTree tablesTree;
 
     private DefaultMutableTreeNode tablesNode;
     private DefaultMutableTreeNode viewsNode;
 
-    private ImageIcon              folderIcon            = createImageIcon("icon/folder.png");
-    private ImageIcon              tableIcon             = createImageIcon("icon/table.png");
-    private ImageIcon              viewIcon              = createImageIcon("icon/view.png");
+    private ImageIcon folderIcon = createImageIcon("icon/folder.png");
+    private ImageIcon tableIcon = createImageIcon("icon/table.png");
+    private ImageIcon viewIcon = createImageIcon("icon/view.png");
 
-    private JPopupMenu             tablesTreePopupMenu;
-    private JMenuItem              mntmTableInfo;
-    private JScrollPane            rightScrollPane;
-    private EditableTable          tableGrid;
-    private DefaultTableModel      tableGridModel;
+    private JPopupMenu tablesTreePopupMenu;
+    private JMenuItem mntmTableInfo;
+    private JScrollPane rightScrollPane;
+    private EditableTable tableGrid;
+    private DefaultTableModel tableGridModel;
 
-    private JSplitPane             rightSplitPane;
-    private JPanel                 rightTopPanel;
-    private JButton                btnGenerate;
+    private JSplitPane rightSplitPane;
+    private JPanel rightTopPanel;
+    private JButton btnGenerate;
 
-    private Configuration          configuration;
-    private TypeMapping            typeMapping;
-    private DbManagementDialog     dbManagementDialog;
-    private DatabaseElement        databaseElement;
-    private transient Connection   connection;
-    private Table                  tableModel;
-    private String                 classPath;
+    private Configuration configuration;
+    private TypeMapping typeMapping;
+    private DbManagementDialog dbManagementDialog;
+    private DatabaseElement databaseElement;
+    private transient Connection connection;
+    private Table tableModel;
+    private String classPath;
 
     /**
      * Create the frame.
      */
-    public Generator(){
+    public Generator() {
         setTitle("CodeGenerator");
         addWindowListener(new WindowAdapter() {
 
@@ -194,43 +181,9 @@ public class Generator extends JFrame {
         contentSplitPane.setDividerLocation(200);
         contentPane.add(contentSplitPane, BorderLayout.CENTER);
 
-        TreeNodeData nodedata = new TreeNodeData("root", folderIcon, "");
-        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(nodedata);
-
-        nodedata = new TreeNodeData("表", folderIcon, "");
-        tablesNode = new DefaultMutableTreeNode(nodedata);
-        rootNode.add(tablesNode);
-        nodedata = new TreeNodeData("视图", folderIcon, "");
-        viewsNode = new DefaultMutableTreeNode(nodedata);
-        rootNode.add(viewsNode);
-
-        JScrollPane leftScrollPane = new JScrollPane();
-        contentSplitPane.setLeftComponent(leftScrollPane);
-
-        leftScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-
-        tablesTreeModel = new DefaultTreeModel(rootNode);
-        tablesTree = new javax.swing.JTree(tablesTreeModel);
-        tablesTree.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                onTablesTreeMouseReleased(e);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                onTablesTreeMousePressed(e);
-            }
-        });
-
-        tablesTree.setRootVisible(false);
-        tablesTree.setShowsRootHandles(true);
-        leftScrollPane.setViewportView(tablesTree);
-        tablesTree.setCellRenderer(new GridCellRenderer());
+        contentSplitPane.setLeftComponent(buildLeftPane());
 
         tablesTreePopupMenu = new JPopupMenu();
-
         mntmTableInfo = new JMenuItem("获取表信息");
         tablesTreePopupMenu.add(mntmTableInfo);
         mntmTableInfo.addActionListener(new ActionListener() {
@@ -289,17 +242,88 @@ public class Generator extends JFrame {
         initSettings();
     }
 
+    private JPanel buildLeftPane() {
+        JPanel leftPane = new JPanel(new BorderLayout());
+        leftPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        initTableTree();
+        final JScrollPane treePane = new JScrollPane(tablesTree);
+        treePane.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        leftPane.add(treePane, BorderLayout.CENTER);
+
+        //  表名搜索框，根据输入的表名，在tree中选择第一个匹配的表名
+        JTextField tableSearchField = new JTextField("");
+        leftPane.add(tableSearchField, BorderLayout.NORTH);
+        tableSearchField.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                JTextField field = (JTextField) e.getSource();
+                String text = field.getText();
+                if (text == null || text.length() == 0) return;
+                text = text.toLowerCase();
+
+                //  search table names
+                for (int i = 0; i < tablesNode.getChildCount(); i++) {
+                    DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) tablesNode.getChildAt(i);
+                    TreeNodeData nodeData = (TreeNodeData) childNode.getUserObject();
+                    if (nodeData.getText().toLowerCase().contains(text)) {
+                        TreePath path = new TreePath(childNode.getPath());
+                        tablesTree.setSelectionPath(path);
+                        tablesTree.scrollPathToVisible(path);
+                        break;
+                    }
+                }
+            }
+        });
+        return leftPane;
+    }
+
+    /**
+     * 初始化左侧表和视图的树形结构
+     */
+    private void initTableTree() {
+        TreeNodeData nodeData = new TreeNodeData("root", folderIcon, "");
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(nodeData);
+
+        nodeData = new TreeNodeData("表", folderIcon, "");
+        tablesNode = new DefaultMutableTreeNode(nodeData);
+        rootNode.add(tablesNode);
+        nodeData = new TreeNodeData("视图", folderIcon, "");
+        viewsNode = new DefaultMutableTreeNode(nodeData);
+        rootNode.add(viewsNode);
+
+        tablesTreeModel = new DefaultTreeModel(rootNode);
+
+        tablesTree = new javax.swing.JTree(tablesTreeModel);
+        tablesTree.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                onTablesTreeMouseReleased(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                onTablesTreeMousePressed(e);
+            }
+        });
+
+        tablesTree.setRootVisible(false);
+        tablesTree.setShowsRootHandles(true);
+        tablesTree.setCellRenderer(new GridCellRenderer());
+    }
+
     private void initSettings() {
         File f = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
         classPath = f.getParentFile().getPath() + File.separator;
         classPath = classPath.replaceAll("%20", " ");
 
-        configuration = new Configuration(classPath);
+        configuration = new Configuration("./");
         try {
             configuration.loadConfiguration();
             if (!configuration.getClassPathEntries().isEmpty()) {
-                ClassLoader classLoader = ClassloaderUtility.getCustomClassloader(classPath,
-                                                                                  configuration.getClassPathEntries());
+                ClassLoader classLoader = ClassloaderUtility.getCustomClassloader("./",
+                        configuration.getClassPathEntries());
                 ObjectFactory.addExternalClassLoader(classLoader);
             }
         } catch (Exception e) {
@@ -307,7 +331,7 @@ public class Generator extends JFrame {
             JOptionPane.showMessageDialog(this, e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
 
-        typeMapping = new TypeMapping(classPath);
+        typeMapping = new TypeMapping("./");
         try {
             typeMapping.loadMappgin();
         } catch (Exception e) {
@@ -320,7 +344,7 @@ public class Generator extends JFrame {
 
     private static void initGlobalFont(Font font) {
         FontUIResource fontRes = new FontUIResource(font);
-        for (Enumeration<Object> keys = UIManager.getDefaults().keys(); keys.hasMoreElements();) {
+        for (Enumeration<Object> keys = UIManager.getDefaults().keys(); keys.hasMoreElements(); ) {
             Object key = keys.nextElement();
             Object value = UIManager.get(key);
             if (value instanceof FontUIResource) {
@@ -453,16 +477,16 @@ public class Generator extends JFrame {
                     cellValue = "";
                 }
                 int width = tableGrid.getCellRenderer(i, j).getTableCellRendererComponent(tableGrid, cellValue, false,
-                                                                                          false, i, j).getPreferredSize().width;
+                        false, i, j).getPreferredSize().width;
                 if (width > max) {
                     max = width;
                 }
             }
             int headerwidth = tableGrid.getTableHeader().getDefaultRenderer().getTableCellRendererComponent(tableGrid,
-                                                                                                            tableGrid.getColumnModel().getColumn(j).getIdentifier(),
-                                                                                                            false,
-                                                                                                            false, -1,
-                                                                                                            j).getPreferredSize().width;
+                    tableGrid.getColumnModel().getColumn(j).getIdentifier(),
+                    false,
+                    false, -1,
+                    j).getPreferredSize().width;
             max += headerwidth;
             tableGrid.getColumnModel().getColumn(j).setPreferredWidth(max);
             allwidth += max + tableGrid.getIntercellSpacing().width;
@@ -484,8 +508,8 @@ public class Generator extends JFrame {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == IDX_COLUMN_JAVATYPE || column == IDX_COLUMN_NULLABLE || column == IDX_COLUMN_DISPLAY
-                                || column == IDX_COLUMN_SEARCHABLE || column == IDX_COLUMN_DICT
-                       || column == IDX_COLUMN_REMARK;
+                        || column == IDX_COLUMN_SEARCHABLE || column == IDX_COLUMN_DICT
+                        || column == IDX_COLUMN_REMARK;
             }
         };
         tableGridModel.addTableModelListener(new MyTableModelListener());
