@@ -18,6 +18,7 @@ package org.joy.db;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import org.joy.config.TypeMapping;
@@ -117,7 +118,9 @@ public class DefaultDatabase extends Database {
                 column.setDefaultValue(rs.getString("COLUMN_DEF"));
                 column.setDecimalDigits(rs.getInt("DECIMAL_DIGITS"));
                 column.setRemarks(rs.getString("REMARKS"));
-                column.setAutoincrement(rs.getBoolean("IS_AUTOINCREMENT"));
+                if (hasColumn(rs, "IS_AUTOINCREMENT")) {
+                    column.setAutoincrement(rs.getBoolean("IS_AUTOINCREMENT"));
+                }
 
                 column.setJdbcTypeName(JdbcTypeResolver.getJdbcTypeName(column.getJdbcType()));
                 column.setJavaType(typeMapping.calculateJavaType(column));
@@ -266,5 +269,16 @@ public class DefaultDatabase extends Database {
             close(rs);
             close(psmt);
         }
+    }
+
+    protected boolean hasColumn(ResultSet rs, String columnName) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columns = rsmd.getColumnCount();
+        for (int x = 1; x <= columns; x++) {
+            if (columnName.equals(rsmd.getColumnName(x))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
