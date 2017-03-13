@@ -15,8 +15,6 @@
  */
 package org.joy.generator;
 
-import org.apache.log4j.Logger;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -38,6 +36,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
 import org.joy.config.Configuration;
 import org.joy.config.model.TemplateElement;
 import org.joy.db.model.Table;
@@ -257,22 +256,30 @@ public class GenerationDialog extends JDialog {
         model.put("moduleName", configuration.getModuleName());
         model.put("table", tableModel);
 
+        Map<String, Boolean> selectedTemplateMap = new HashMap<String, Boolean>();
+
         for (TemplateElement templateElement : configuration.getTemplates()) {
             templateElement.setSelected(false);
+            selectedTemplateMap.put(templateElement.getTemplateId(), false);
         }
+        for (int i=0;i<selectedTemplateElements.length; i++) {
+            TemplateElement templateElement = (TemplateElement) selectedTemplateElements[i];
+            selectedTemplateMap.put(templateElement.getTemplateId(), true);
+        }
+        model.put("template", selectedTemplateMap);
 
-
-        int count = selectedTemplateElements.length;
-        for (int i=0;i<count; i++) {
+        for (int i=0;i<selectedTemplateElements.length; i++) {
             try {
                 TemplateElement templateElement = (TemplateElement) selectedTemplateElements[i];
                 templateElement.setSelected(true);
 
-                TemplateEngine templateEngine = engineBuilder.getTemplateEngine(templateElement.getEngine());
-                if(templateEngine==null){
-                    JOptionPane.showMessageDialog(this, "没有对应的模板引擎: "+templateElement.getEngine(), "错误", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    templateEngine.processToFile(model, templateElement);
+                if (templateElement.getTemplateFile().trim().length()>0) {
+                    TemplateEngine templateEngine = engineBuilder.getTemplateEngine(templateElement.getEngine());
+                    if (templateEngine == null) {
+                        JOptionPane.showMessageDialog(this, "没有对应的模板引擎: " + templateElement.getEngine(), "错误", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        templateEngine.processToFile(model, templateElement);
+                    }
                 }
             } catch (Exception e) {
                 LOGGER.info(e.getMessage(), e);

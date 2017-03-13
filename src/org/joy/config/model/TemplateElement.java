@@ -17,6 +17,7 @@ package org.joy.config.model;
 
 public class TemplateElement {
 
+    private String templateId;
     private String templateName;
     private String engine;
     private String templateFile;
@@ -25,8 +26,9 @@ public class TemplateElement {
     private String encoding;
     private boolean selected;
 
-    public TemplateElement(String templateName, String engine, String templateFile, String targetPath, String targetFileName, String encoding){
+    public TemplateElement(String templateId, String templateName, String engine, String templateFile, String targetPath, String targetFileName, String encoding){
         super();
+        this.templateId = templateId;
         this.templateName = templateName;
         this.engine = engine;
         this.templateFile = templateFile;
@@ -40,11 +42,11 @@ public class TemplateElement {
     }
 
     public String getTemplateFile() {
-        return templateFile;
+        return templateFile==null?"":templateFile;
     }
 
     public String getTargetPath() {
-        return targetPath;
+        return targetPath==null?"":targetPath;
     }
 
     public void setTargetPath(String targetPath) {
@@ -52,7 +54,7 @@ public class TemplateElement {
     }
 
     public String getTargetFileName() {
-        return targetFileName;
+        return targetFileName==null?"":targetFileName;
     }
 
     public void setTargetFileName(String targetFileName) {
@@ -60,7 +62,7 @@ public class TemplateElement {
     }
 
     public String getTemplateName() {
-        return templateName;
+        return templateName==null?"":templateName;
     }
 
 
@@ -85,7 +87,7 @@ public class TemplateElement {
 
 
     public String getEngine() {
-        return engine;
+        return engine==null?"freemarker":engine;
     }
 
 
@@ -95,11 +97,19 @@ public class TemplateElement {
 
 
     public String getEncoding() {
-        return encoding;
+        return encoding==null?"":encoding;
     }
 
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+
+    public String getTemplateId() {
+        return templateId==null?"":templateId;
+    }
+
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 }

@@ -23,8 +23,6 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -40,7 +38,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -48,8 +60,12 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.Position;
-import javax.swing.tree.*;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
@@ -79,13 +95,16 @@ public class Generator extends JFrame {
     private static Font FONT_YAHEI = new Font("微软雅黑", Font.PLAIN, 12);
 
     private String[] headers = {"字段名", "字段类型", "JAVA类型", "大小", "主键", "唯一", "自增", "外键",
-            "可空", "默认值", "显示", "可搜索", "数据字典", "注释"};
+            "可空", "默认值", "显示", "搜索", "排序", "数据字典", "注释"};
+    private int[] headerWidth = {120, 80, 80, 50, 40, 40, 40, 40,
+                                40, 50, 40, 40, 40, 100, 150};
     public static final int IDX_COLUMN_JAVATYPE = 2;
     public static final int IDX_COLUMN_NULLABLE = 8;
     public static final int IDX_COLUMN_DISPLAY = 10;
     public static final int IDX_COLUMN_SEARCHABLE = 11;
-    public static final int IDX_COLUMN_DICT = 12;
-    public static final int IDX_COLUMN_REMARK = 13;
+    public static final int IDX_COLUMN_SORTABLE = 12;
+    public static final int IDX_COLUMN_DICT = 13;
+    public static final int IDX_COLUMN_REMARK = 14;
 
     private JPanel contentPane;
     private JSplitPane contentSplitPane;
@@ -205,14 +224,6 @@ public class Generator extends JFrame {
         rightScrollPane = new JScrollPane();
         rightScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         rightSplitPane.setBottomComponent(rightScrollPane);
-
-        rightScrollPane.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                resizeTableGrid(true);
-            }
-        });
 
         tableGrid = new EditableTable();
         rightScrollPane.setViewportView(tableGrid);
@@ -461,41 +472,29 @@ public class Generator extends JFrame {
         }
     }
 
-    private void resizeTableGrid(boolean bool) {
-        Dimension containerwidth = null;
-        if (!bool) {
-            containerwidth = rightScrollPane.getPreferredSize();
-        } else {
-            containerwidth = rightScrollPane.getSize();
-        }
-        int allwidth = tableGrid.getIntercellSpacing().width;
-        for (int j = 0; j < tableGrid.getColumnCount(); j++) {
-            int max = 0;
-            for (int i = 0; i < tableGrid.getRowCount(); i++) {
-                Object cellValue = tableGrid.getValueAt(i, j);
-                if (cellValue == null) {
-                    cellValue = "";
-                }
-                int width = tableGrid.getCellRenderer(i, j).getTableCellRendererComponent(tableGrid, cellValue, false,
-                        false, i, j).getPreferredSize().width;
-                if (width > max) {
-                    max = width;
-                }
+    public void fitTableColumns(JTable table) {
+        JTableHeader header = table.getTableHeader();
+        int rowCount = table.getRowCount();
+        Enumeration<TableColumn> columns = table.getColumnModel().getColumns();
+        while (columns.hasMoreElements()) {
+            TableColumn column = (TableColumn) columns.nextElement();
+            int col = header.getColumnModel().getColumnIndex(column.getIdentifier());
+            int width = (int) table.getTableHeader().getDefaultRenderer()
+                    .getTableCellRendererComponent(table,column.getIdentifier(), false, false, -1, col).getPreferredSize().getWidth();
+            for (int row = 0; row < rowCount; row++) {
+                int preferedWidth = (int) table.getCellRenderer(row, col)
+                        .getTableCellRendererComponent(table,
+                                table.getValueAt(row, col), false, false, row,col).getPreferredSize().getWidth();
+                width = Math.max(width, preferedWidth);
             }
-            int headerwidth = tableGrid.getTableHeader().getDefaultRenderer().getTableCellRendererComponent(tableGrid,
-                    tableGrid.getColumnModel().getColumn(j).getIdentifier(),
-                    false,
-                    false, -1,
-                    j).getPreferredSize().width;
-            max += headerwidth;
-            tableGrid.getColumnModel().getColumn(j).setPreferredWidth(max);
-            allwidth += max + tableGrid.getIntercellSpacing().width;
+            header.setResizingColumn(column); // 此行很重要
+            column.setWidth(width + table.getIntercellSpacing().width);
         }
-        allwidth += tableGrid.getIntercellSpacing().width;
-        if (allwidth > containerwidth.width) {
-            tableGrid.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        } else {
-            tableGrid.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+    }
+
+    public void fitTableColumns(JTable table, int[] columnWidths) {
+        for (int i = 0; i < columnWidths.length; i++) {
+            table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
         }
     }
 
@@ -508,8 +507,8 @@ public class Generator extends JFrame {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == IDX_COLUMN_JAVATYPE || column == IDX_COLUMN_NULLABLE || column == IDX_COLUMN_DISPLAY
-                        || column == IDX_COLUMN_SEARCHABLE || column == IDX_COLUMN_DICT
-                        || column == IDX_COLUMN_REMARK;
+                        || column == IDX_COLUMN_SEARCHABLE || column == IDX_COLUMN_SORTABLE
+                        || column == IDX_COLUMN_DICT || column == IDX_COLUMN_REMARK;
             }
         };
         tableGridModel.addTableModelListener(new MyTableModelListener());
@@ -518,7 +517,7 @@ public class Generator extends JFrame {
 
         tableGrid.setComboCell(IDX_COLUMN_JAVATYPE, new ComboBoxEditor(typeMapping.getAllJavaTypes()));// 第2列为下拉
 
-        resizeTableGrid(true);
+        fitTableColumns(tableGrid, headerWidth);
     }
 
     private void loadDatabaseTable() {
@@ -572,12 +571,13 @@ public class Generator extends JFrame {
                 cellData[row][col++] = item.getDefaultValue();
                 cellData[row][col++] = item.isDisplay();
                 cellData[row][col++] = item.isSearchable();
+                cellData[row][col++] = item.isSortable();
                 cellData[row][col++] = item.getDict();
                 cellData[row][col++] = item.getRemarks();
                 row++;
             }
             tableGridModel.setDataVector(cellData, headers);
-            resizeTableGrid(true);
+            fitTableColumns(tableGrid, headerWidth);
             btnGenerate.setEnabled(true);
         } catch (Exception e) {
             LOGGER.info(e.getMessage(), e);
@@ -689,6 +689,8 @@ public class Generator extends JFrame {
                         column.setDisplay(Boolean.parseBoolean(value));
                     } else if (e.getColumn() == IDX_COLUMN_SEARCHABLE) {
                         column.setSearchable(Boolean.parseBoolean(value));
+                    } else if (e.getColumn() == IDX_COLUMN_SORTABLE) {
+                        column.setSortable(Boolean.parseBoolean(value));
                     } else if (e.getColumn() == IDX_COLUMN_DICT) {
                         column.setDict(value);
                     }

@@ -133,12 +133,13 @@ public class Configuration {
     }
 
     private void parseTemplate(Node node, XPath path) throws XPathExpressionException {
-        String name = null, engine = null, templateFile = null, targetPath = null, targetFileName = null, encoding = null;
+        String id=null, name = null, engine = null, templateFile = null, targetPath = null, targetFileName = null, encoding = null;
         templateFile = path.evaluate("./templateFile/text()", node);
         targetPath = path.evaluate("./targetPath/text()", node);
         targetFileName = path.evaluate("./targetFileName/text()", node);
         encoding = path.evaluate("./encoding/text()", node);
 
+        id = path.evaluate("@id", node);
         name = path.evaluate("@name", node);
         engine = path.evaluate("@engine", node);
 
@@ -151,9 +152,8 @@ public class Configuration {
         if (StringUtil.isEmpty(name)) {
             name = templateFile;
         }
-        if (StringUtil.isNotEmpty(templateFile) && StringUtil.isNotEmpty(targetPath)
-            && StringUtil.isNotEmpty(targetFileName)) {
-            TemplateElement templateElement = new TemplateElement(name, engine, templateFile, targetPath,
+        if (StringUtil.isNotEmpty(name) && StringUtil.isNotEmpty(id)) {
+            TemplateElement templateElement = new TemplateElement(id, name, engine, templateFile, targetPath,
                                                                   targetFileName, encoding);
             templates.add(templateElement);
             templateElement.setSelected(Boolean.parseBoolean(parseAttributes(node).getProperty("selected")));
@@ -288,6 +288,7 @@ public class Configuration {
 
     private void writeTemplate(Element elem, TemplateElement t) {
         Element e = elem.getOwnerDocument().createElement("template");
+        e.setAttribute("id", t.getTemplateId());
         e.setAttribute("name", t.getTemplateName());
         e.setAttribute("engine", t.getEngine());
         e.setAttribute("selected", String.valueOf(t.isSelected()));

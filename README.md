@@ -35,9 +35,11 @@ CodeGenerator
 ```
 
 ##模板中可用的变量和方法
-    String       targetProject       目标工程路径(代码保存的基准路径)
-    String       basePackage         基准包
-    String       moduleName          模块名
+    String                targetProject       目标工程路径(代码保存的基准路径)
+    String                basePackage         基准包
+    String                moduleName          模块名
+    Map<String, Boolean>  template            模板是否可用（是否勾选生成）  
+    
 ### table 对象
 ####属性
     String       tableName           表名
@@ -71,6 +73,8 @@ CodeGenerator
     boolean      hasNotNullColumn    是否有非空的基本类型字段
 
     boolean      hasNotBlankColumn   是否有非空的 String 字段
+
+    boolean      hasSearchableColumn 是否有可搜索的 字段
 
 
 ### Column
@@ -111,13 +115,15 @@ CodeGenerator
 
     String  fullJavaType      完整的Java类型，比如 java.lang.String
 
-    String  getterMethodName  Get方法名
+    String  getterMethodName  Get方法名  
 
-    String  setterMethodName  Set方法名
+    String  setterMethodName  Set方法名  
 
-    boolean display           是否显示
+    boolean display           是否显示  
 
-    boolean searchable        是否可搜索
+    boolean searchable        是否可搜索  
+    
+    boolean orderable         是否可排序  
 
     String  dict              数据字典名
 

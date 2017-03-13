@@ -13,13 +13,13 @@
     <basePackage>org.joy</basePackage>
     <moduleName>test</moduleName>
     <templates>
-        <template engine="freemarker" name="实体类" selected="false">
+        <template id="entity1" engine="freemarker" name="实体类" selected="false">
             <templateFile>entity.ftl</templateFile>
             <targetPath>${targetProject}\src\${basePackage}\${moduleName}\entity\</targetPath>
             <targetFileName>${table.className}.java</targetFileName>
             <encoding>UTF-8</encoding>
         </template>
-        <template engine="velocity" name="实体类" selected="false">
+        <template id="entity2" engine="velocity" name="实体类" selected="false">
             <templateFile>entity.vm</templateFile>
             <targetPath>${targetProject}\\src\\${basePackage}\\${moduleName}\\entity\\</targetPath>
             <targetFileName>${table.className}2.java</targetFileName>

@@ -55,7 +55,8 @@ public class Column implements Serializable {
     private String            editor;
     private boolean           display          = true;
     private boolean           searchable;
-    private String            dict = "";
+    private boolean           sortable         = false;
+    private String            dict             = "";
 
     public Column(String columnName){
         this.columnName = columnName;
@@ -183,31 +184,28 @@ public class Column implements Serializable {
         return isBlob;
     }
 
-    public boolean isPrimitiveType(){
-        //int, double, float, long, short, boolean, byte, char
-        return JavaTypeResolver.isInteger(javaType)
-            || JavaTypeResolver.isDouble(javaType)
-            || JavaTypeResolver.isFloat(javaType)
-            || JavaTypeResolver.isLong(javaType)
-            || JavaTypeResolver.isShort(javaType)
-            || JavaTypeResolver.isBoolean(javaType)
-            || JavaTypeResolver.isByte(javaType);
+    public boolean isPrimitiveType() {
+        // int, double, float, long, short, boolean, byte, char
+        return JavaTypeResolver.isInteger(javaType) || JavaTypeResolver.isDouble(javaType)
+               || JavaTypeResolver.isFloat(javaType) || JavaTypeResolver.isLong(javaType)
+               || JavaTypeResolver.isShort(javaType) || JavaTypeResolver.isBoolean(javaType)
+               || JavaTypeResolver.isByte(javaType);
     }
 
     public String getJavaPrimitiveType() {
-        if (JavaTypeResolver.isInteger(javaType)){
+        if (JavaTypeResolver.isInteger(javaType)) {
             return "int";
-        } else if (JavaTypeResolver.isDouble(javaType)){
+        } else if (JavaTypeResolver.isDouble(javaType)) {
             return "double";
-        } else if (JavaTypeResolver.isFloat(javaType)){
+        } else if (JavaTypeResolver.isFloat(javaType)) {
             return "float";
-        } else if (JavaTypeResolver.isLong(javaType)){
+        } else if (JavaTypeResolver.isLong(javaType)) {
             return "long";
-        } else if (JavaTypeResolver.isShort(javaType)){
+        } else if (JavaTypeResolver.isShort(javaType)) {
             return "short";
-        } else if (JavaTypeResolver.isBoolean(javaType)){
+        } else if (JavaTypeResolver.isBoolean(javaType)) {
             return "boolean";
-        } else if (JavaTypeResolver.isByte(javaType)){
+        } else if (JavaTypeResolver.isByte(javaType)) {
             return "byte";
         } else {
             return javaType;
@@ -327,8 +325,17 @@ public class Column implements Serializable {
     public boolean hasDict() {
         return StringUtil.isNotEmpty(dict);
     }
+
     public void setDict(String dict) {
         this.dict = dict;
+    }
+
+    public boolean isSortable() {
+        return sortable;
+    }
+
+    public void setSortable(boolean sortable) {
+        this.sortable = sortable;
     }
 
 }

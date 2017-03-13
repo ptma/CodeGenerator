@@ -189,6 +189,15 @@ public class Table implements java.io.Serializable {
         return false;
     }
 
+    public boolean isHasSearchableColumn() {
+        for (Column column : getColumns()) {
+            if (column.isSearchable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public List<Key> getImportedKeys() {
         return importedKeys;
